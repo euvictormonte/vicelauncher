@@ -4,7 +4,7 @@ import { act as send, getBackend } from "./api"
 import type { Action, PlayChoice, Project, Snapshot } from "./types"
 import { t } from "./i18n"
 
-export type View = "home" | "library" | "settings"
+export type View = "home" | "library" | "saves" | "settings"
 export type ProjectTab = "overview" | "graphics" | "launch" | "notes" | "activity"
 
 export type Dialog =

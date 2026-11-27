@@ -25,7 +25,7 @@ export function Brand() {
         draggable={false}
       />
       <img
-        src="/neves-launcher-logo.svg"
+        src={theme === "light" ? "/neves-launcher-logo-light.svg" : "/neves-launcher-logo.svg"}
         alt="Neves Launcher"
         onClick={onLogo}
         className="h-auto w-[180px] max-w-[calc(100%-2rem)] object-contain [-webkit-app-region:no-drag]"

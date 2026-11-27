@@ -7,6 +7,7 @@ import { Dialogs } from "@/features/dialogs/dialogs"
 import { LibrarySkeleton, LibraryView } from "@/features/library/library-view"
 import { HomeSkeleton, HomeView } from "@/features/home/home-view"
 import { SettingsView } from "@/features/settings/settings-view"
+import { CommunitySavesView } from "@/features/saves/community-saves-view"
 import { getBackend } from "@/lib/api"
 import { scheduleRefresh, useStore } from "@/lib/store"
 import { t, useLanguage } from "@/lib/i18n"
@@ -48,7 +49,9 @@ export function App() {
           <div className="drag absolute inset-x-0 top-0 z-30 flex h-10 justify-end">
             <WindowControls />
           </div>
-          {!snap ? (
+          {view === "saves" ? (
+            <CommunitySavesView />
+          ) : !snap ? (
             view === "library" ? <LibrarySkeleton /> : view === "home" ? <HomeSkeleton /> : null
           ) : view === "home" ? (
             <HomeView />

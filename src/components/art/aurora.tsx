@@ -97,7 +97,7 @@ function FallbackSlideshow({ images, moving }: { images: AuroraBanner[]; moving:
   const [index, setIndex] = useState(0)
   useEffect(() => {
     if (images.length < 2 || !moving) return
-    const timer = setInterval(() => setIndex((current) => (current + 1) % images.length), 8000)
+    const timer = setInterval(() => setIndex((current) => (current + 1) % images.length), 6000)
     return () => clearInterval(timer)
   }, [images, moving])
 

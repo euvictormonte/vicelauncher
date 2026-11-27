@@ -924,7 +924,9 @@ mod tests {
         let exe = root.join("diag").join("victory.exe");
         std::fs::create_dir_all(exe.parent().unwrap()).unwrap();
         std::fs::write(&exe, b"exe").unwrap();
-        // Not the real Microsoft files, so the build's copy must not be used as-is.
+        // Give the fixture's files explicit hashes so the test never needs NuGet.
+        let core_hash = sha256(b"core");
+        let layers_hash = sha256(b"layers");
         let source = root
             .join("diag")
             .join("build")
@@ -937,6 +939,13 @@ mod tests {
 
         let repo = root.join("repo");
         std::fs::create_dir_all(&repo).unwrap();
+        std::fs::write(
+            repo.join("build.rs"),
+            format!(
+                "(\"D3D12Core.dll\", \"{core_hash}\"),\n(\"d3d12SDKLayers.dll\", \"{layers_hash}\"),\n"
+            ),
+        )
+        .unwrap();
         let check = Check {
             exe: &exe,
             game_dir: &root,
@@ -954,11 +963,7 @@ mod tests {
         };
         assert_eq!(preflight(&check).len(), 1);
         assert_eq!(preflight(&check)[0].fix, Some(FIX_AGILITY));
-        // The build's files are not the real Microsoft ones, so the fix falls back
-        // to Microsoft's package (this needs the network).
-        if let Err(error) = fix(FIX_AGILITY, &exe, &repo, &root.join("cache")) {
-            eprintln!("network fix skipped: {error}");
-        }
+        fix(FIX_AGILITY, &exe, &repo, &root.join("cache")).unwrap();
         assert!(agility_ok(exe.parent().unwrap(), &agility_for(&repo)));
         std::fs::remove_dir_all(root).unwrap();
     }

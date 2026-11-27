@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react"
-import { ArrowRight, Clock3, Gamepad2, Library, Plus, Sparkles } from "lucide-react"
+import { ArrowRight, Clock3, Gamepad2, Library, Plus } from "lucide-react"
 import { Aurora } from "@/components/art/aurora"
 import { ProjectAvatar } from "@/components/art/project-avatar"
 import { Bone } from "@/components/shell/skeleton"
@@ -63,17 +63,7 @@ export function HomeView() {
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-[1280px] space-y-8 px-8 pt-14 pb-12 xl:px-10">
         <header>
-          <p className="mb-2 flex items-center gap-2 text-caption font-semibold uppercase tracking-[0.14em] text-accent-fg">
-            <Sparkles className="size-3.5" /> {t("Neves Launcher")}
-          </p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="font-display text-page font-bold tracking-[-0.03em] text-fg">{!screenshot && nickname ? t("Welcome back, {name}", { name: nickname }) : !screenshot && hasCompletedWelcome() ? t("Welcome to Neves Launcher!") : t("Welcome back")}</h1>
-            {!screenshot && !welcomeOpen && (
-              <button type="button" onClick={() => setWelcomeOpen(true)} className="text-caption font-medium text-accent-fg underline-offset-4 hover:underline">
-                {nickname ? t("Change name") : t("Set a nickname")}
-              </button>
-            )}
-          </div>
+          <h1 className="font-display text-page font-bold tracking-[-0.03em] text-fg">{!screenshot && nickname ? t("Welcome back, {name}", { name: nickname }) : !screenshot && hasCompletedWelcome() ? t("Welcome to Neves Launcher!") : t("Welcome back")}</h1>
           <p className="mt-2 text-lead text-fg-2">{t("Your gaming space, all in one place.")}</p>
         </header>
 
