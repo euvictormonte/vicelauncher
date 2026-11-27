@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use crate::brand::{RELEASE_ASSET as ASSET, REPOSITORY};
 
-pub const RELEASES: &str = "https://github.com/euvictormonte/vilauncher/releases";
+pub const RELEASES: &str = "https://github.com/euvictormonte/vicelauncher/releases";
 const MAX_BYTES: u64 = 64 * 1024 * 1024;
 
 #[derive(Deserialize)]

@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.82"
 description = "Neves Launcher: a launcher for community projects from VIPortLive or custom links. Check the game files, build and play. Forked from VILauncher, based on Mandyhub."
 license = "GPL-3.0-or-later"
-repository = "https://github.com/euvictormonte/vilauncher"
+repository = "https://github.com/euvictormonte/vicelauncher"
 homepage = "https://viportlive.com"
 authors = ["VIPortLive team", "Zettrox and the Mandyhub contributors"]
 

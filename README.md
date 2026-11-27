@@ -4,8 +4,8 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: GPL-3.0-or-later" src="https://img.shields.io/badge/license-GPL--3.0--or--later-ff4fa8"></a>
-  <a href="https://github.com/dazacode/vilauncher/actions/workflows/build.yml"><img alt="Upstream build" src="https://github.com/dazacode/vilauncher/actions/workflows/build.yml/badge.svg"></a>
-  <a href="https://github.com/dazacode/vilauncher/releases/latest"><img alt="Upstream release" src="https://img.shields.io/github/v/release/dazacode/vilauncher?color=ff4fa8&cacheSeconds=300"></a>
+  <a href="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml"><img alt="Build" src="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml/badge.svg"></a>
+  <a href="https://github.com/euvictormonte/vicelauncher/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/euvictormonte/vicelauncher?color=ff4fa8&cacheSeconds=300"></a>
 </p>
 
 A Windows launcher for community game projects. It lists projects from [VIPortLive](https://viportlive.com), downloads and builds them with Git and Cargo, and starts them with **your own copy of the game files**.
@@ -40,11 +40,11 @@ Mandyhub's settings and installed projects are carried over on first start, so n
 
 ## What's new
 
-The links and badges above point to the upstream VILauncher repository. Neves Launcher does not have its own release repository yet, so those builds and downloads are not Neves Launcher releases.
+New versions and downloads are published on [GitHub Releases](https://github.com/euvictormonte/vicelauncher/releases). The build workflow runs for each `v*` tag.
 
 ## Download
 
-There is no Neves Launcher release download yet. Build it from source using the steps below. The updater only accepts a release containing `Neves Launcher.exe`; the upstream VILauncher executable is not installed as an update.
+Download `Neves Launcher.exe` (portable) or the installer from [Releases](https://github.com/euvictormonte/vicelauncher/releases/latest). The launcher checks for its own updates at start and verifies the executable's SHA-256 before replacing itself.
 
 ### Antivirus flags
 

@@ -9,8 +9,8 @@ pub const TEAM: &str = "Neves Launcher team";
 pub const SITE: &str = "https://viportlive.com";
 pub const SITE_LABEL: &str = "viportlive.com";
 /// The launcher's own code and releases on GitHub (`owner/name`).
-pub const REPOSITORY: &str = "euvictormonte/vilauncher";
-pub const SOURCE_URL: &str = "https://github.com/euvictormonte/vilauncher";
+pub const REPOSITORY: &str = "euvictormonte/vicelauncher";
+pub const SOURCE_URL: &str = "https://github.com/euvictormonte/vicelauncher";
 /// The release download the updater looks for.
 pub const RELEASE_ASSET: &str = "Neves Launcher.exe";
 

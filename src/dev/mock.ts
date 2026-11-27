@@ -78,7 +78,7 @@ function snapshot(): Snapshot {
   return {
     version: "0.1.0",
     notice_accepted: state.notice,
-    brand: { name: "Neves Launcher", team: "Neves Launcher team", site: "https://viportlive.com", site_label: "viportlive.com", source: "https://github.com/euvictormonte/vilauncher" },
+    brand: { name: "Neves Launcher", team: "Neves Launcher team", site: "https://viportlive.com", site_label: "viportlive.com", source: "https://github.com/euvictormonte/vicelauncher" },
     list: { status: "ready", error: null, items: SAMPLE.map(project) },
     custom: [],
     selected: state.selected,
@@ -113,7 +113,7 @@ function snapshot(): Snapshot {
       log_lines: state.log.length,
       import_error: null,
     },
-    updater: { state: "current", tag: null, error: null, restart_error: null, releases: "https://github.com/euvictormonte/vilauncher/releases" },
+    updater: { state: "current", tag: null, error: null, restart_error: null, releases: "https://github.com/euvictormonte/vicelauncher/releases" },
     pending_move: null,
     presets: [],
     backgrounds: [],
@@ -146,7 +146,7 @@ async function act(a: Action): Promise<unknown> {
       return {
         title: `${a.repo}: mock report`,
         text: "## What happened\n\n## Log (mock)\n",
-        launcher_url: "https://github.com/euvictormonte/vilauncher/issues/new",
+        launcher_url: "https://github.com/euvictormonte/vicelauncher/issues/new",
         build_url: a.repo.split("/").length === 2 ? `https://github.com/${a.repo}/issues/new` : null,
       }
     case "install_tools":

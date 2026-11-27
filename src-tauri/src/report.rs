@@ -5,7 +5,7 @@
 use serde::Serialize;
 
 /// Where Neves Launcher's own problems are reported.
-pub(crate) const LAUNCHER_REPO: &str = "euvictormonte/vilauncher";
+pub(crate) const LAUNCHER_REPO: &str = "euvictormonte/vicelauncher";
 /// The longest body put in the link; GitHub refuses links that are too long.
 const LINK_BODY_LIMIT: usize = 6000;
 /// The last lines of the log that go in the report.
@@ -162,7 +162,7 @@ mod tests {
         let report = make(&facts(&log, "owner/victory"));
         assert!(report
             .launcher_url
-            .starts_with("https://github.com/euvictormonte/vilauncher/issues/new?"));
+            .starts_with("https://github.com/euvictormonte/vicelauncher/issues/new?"));
         assert!(report
             .build_url
             .as_deref()

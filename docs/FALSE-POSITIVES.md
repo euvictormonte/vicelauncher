@@ -5,9 +5,9 @@ game executables and replaces itself when updating. Its binaries are also unsign
 new on every release. That mix is what heuristic engines score as suspicious even when
 nothing is wrong.
 
-The signature and release links below still refer to the upstream VILauncher repository.
-Neves Launcher has no release repository yet; do not treat an upstream signature or
-download as validation of a Neves Launcher build.
+Neves Launcher releases are published in its own repository. The original VILauncher
+signer is not the signer for this fork; check the signature and checksum of the specific
+Neves Launcher release you downloaded.
 
 The usual result is a VirusTotal page like this:
 
@@ -32,7 +32,7 @@ The file is still worth checking once, but the flag can be removed.
    `Status` should be `Valid` and the signer **VIPortLive team**. `NotSigned` only means
    the release predates signing or the certificate setup; the SHA-256 check still applies.
 3. Read the source. Every release is built by the public
-   [Build workflow](https://github.com/dazacode/vilauncher/actions/workflows/build.yml)
+   [Build workflow](https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml)
    from the tagged commit; nothing is added by hand.
 
 A signed release that still gets an ML hit is a false positive. Signing does not make
@@ -89,7 +89,7 @@ File: Neves Launcher.exe (portable build, also wrapped by the NSIS installer in 
 SHA-256: <digest>
 Version: <version>
 Download: <GitHub release asset URL>
-Source: https://github.com/dazacode/vilauncher (built by the public GitHub Actions workflow)
+Source: https://github.com/euvictormonte/vicelauncher (built by the public GitHub Actions workflow)
 Signature: signed by <certificate subject>, thumbprint <thumbprint>
 # ...or, on an unsigned release: "unsigned; certificate setup is in progress"
 
