@@ -11,6 +11,7 @@ import { copyText, pickFile, saveFile } from "@/lib/api"
 import { useDraft } from "@/lib/hooks"
 import { run, useStore } from "@/lib/store"
 import type { Project } from "@/lib/types"
+import { t as translate } from "@/lib/i18n"
 
 export function LaunchTab({ project: p }: { project: Project }) {
   const snap = useStore((s) => s.snap)!
@@ -93,7 +94,7 @@ function Presets({ project: p }: { project: Project }) {
             <MenuItem
               onSelect={async () => {
                 const path = await pickFile("Import a preset or launch script", [{ name: "Preset or launch script", extensions: ["json", "ps1"] }])
-                if (path) void run<string>({ type: "import_preset_file", repo: p.repo, path }).then((n) => n && toast.success(`Imported “${n}”`))
+                if (path) void run<string>({ type: "import_preset_file", repo: p.repo, path }).then((n) => n && toast.success(translate("Imported “{name}”", { name: n })))
               }}
             >
               <FileUp /> Import file…
@@ -109,9 +110,9 @@ function Presets({ project: p }: { project: Project }) {
         {choices.length > 0 ? (
           <Select label="Preset" value={value || choices[0].value} options={choices} onChange={setPicked} />
         ) : (
-          <span className="text-secondary text-fg-3">No saved presets</span>
+          <span className="text-secondary text-fg-3">{t("No saved presets")}</span>
         )}
-        <Button size="sm" variant="secondary" disabled={choices.length === 0} onClick={() => void run<string>({ type: "apply_preset", repo: p.repo, name: selectedName ?? (value ? null : choices[0]?.value ?? null) }).then((n) => n && toast.success(`Applied “${n}”`))}>
+        <Button size="sm" variant="secondary" disabled={choices.length === 0} onClick={() => void run<string>({ type: "apply_preset", repo: p.repo, name: selectedName ?? (value ? null : choices[0]?.value ?? null) }).then((n) => n && toast.success(translate("Applied “{name}”", { name: n })))}>
           Apply
         </Button>
         {selectedName && (
@@ -128,7 +129,7 @@ function Presets({ project: p }: { project: Project }) {
               >
                 <Download /> Export file…
               </MenuItem>
-              <MenuItem onSelect={() => void run<string>({ type: "preset_text", name: selectedName }).then((t) => t && copyText(t).then(() => toast.success("Preset text copied")))}>
+              <MenuItem onSelect={() => void run<string>({ type: "preset_text", name: selectedName }).then((text) => text && copyText(text).then(() => toast.success(translate("Preset text copied")))}>
                 <Copy /> Copy preset text
               </MenuItem>
               <MenuSeparator />
@@ -147,7 +148,7 @@ function Presets({ project: p }: { project: Project }) {
               <Switch checked={saving.argsOnly} onCheckedChange={(argsOnly) => setSaving({ ...saving, argsOnly })} aria-label="Arguments only" /> Arguments only
             </label>
           )}
-          <Button size="sm" variant="primary" disabled={!saving.name.trim()} onClick={() => void run<string>({ type: "save_preset", repo: p.repo, name: saving.name, include_switches: !saving.argsOnly }).then((n) => { if (n) { toast.success(`Saved “${n}”`); setSaving(null); setPicked(n) } })}>
+          <Button size="sm" variant="primary" disabled={!saving.name.trim()} onClick={() => void run<string>({ type: "save_preset", repo: p.repo, name: saving.name, include_switches: !saving.argsOnly }).then((n) => { if (n) { toast.success(translate("Saved “{name}”", { name: n })); setSaving(null); setPicked(n) } })}>
             Save
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setSaving(null)}>Cancel</Button>
@@ -155,7 +156,7 @@ function Presets({ project: p }: { project: Project }) {
       ) : pasting != null ? (
         <Row stacked label="Paste the text from Copy preset text">
           <Textarea autoFocus value={pasting} onChange={(e) => setPasting(e.target.value)} rows={3} className="font-mono text-secondary" aria-label="Preset text" />
-          <Button size="sm" variant="primary" disabled={!pasting.trim()} onClick={() => void run<string>({ type: "import_preset_text", repo: p.repo, text: pasting }).then((n) => { if (n) { toast.success(`Imported “${n}”`); setPasting(null) } })}>
+          <Button size="sm" variant="primary" disabled={!pasting.trim()} onClick={() => void run<string>({ type: "import_preset_text", repo: p.repo, text: pasting }).then((n) => { if (n) { toast.success(translate("Imported “{name}”", { name: n })); setPasting(null) } })}>
             Import
           </Button>
           <Button size="sm" variant="ghost" onClick={() => setPasting(null)}>Cancel</Button>

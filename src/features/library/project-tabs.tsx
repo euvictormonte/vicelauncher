@@ -3,6 +3,7 @@ import { useRef } from "react"
 import { useStore, type ProjectTab } from "@/lib/store"
 import type { Project } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { t as translate } from "@/lib/i18n"
 import { ActivityTab } from "./activity-tab"
 import { GraphicsTab } from "./graphics-tab"
 import { LaunchTab } from "./launch-tab"
@@ -39,7 +40,7 @@ export function ProjectTabs({ project }: { project: Project }) {
   }
   return (
     <div className="max-w-[1280px] px-10 pb-16">
-      <div ref={listRef} role="tablist" aria-label="Project" onKeyDown={onKey} className="flex gap-8 border-b border-line">
+      <div ref={listRef} role="tablist" aria-label={translate("Project")} onKeyDown={onKey} className="flex gap-8 border-b border-line">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -55,8 +56,8 @@ export function ProjectTabs({ project }: { project: Project }) {
               tab === t.id ? "text-fg" : "text-fg-3 hover:text-fg-2",
             )}
           >
-            {t.label}
-            {t.id === "activity" && running && <span className="size-1.5 rounded-full bg-accent" aria-label="Running" />}
+            {translate(t.label)}
+            {t.id === "activity" && running && <span className="size-1.5 rounded-full bg-accent" aria-label={translate("Running")} />}
             {tab === t.id && <motion.span layoutId="tab-line" className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-accent" transition={{ type: "spring", duration: 0.3, bounce: 0.1 }} />}
           </button>
         ))}
@@ -72,7 +73,7 @@ export function ProjectTabs({ project }: { project: Project }) {
         className="pt-8"
       >
         {hidden ? (
-          <p className="text-body text-fg-3">Hidden in Screenshot mode.</p>
+          <p className="text-body text-fg-3">{translate("Hidden in Screenshot mode.")}</p>
         ) : tab === "overview" ? (
           <OverviewTab project={project} />
         ) : tab === "graphics" ? (

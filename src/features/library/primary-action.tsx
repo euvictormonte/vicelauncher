@@ -6,6 +6,7 @@ import { shortCommit, shortStage } from "@/lib/format"
 import { allProjects, run, useAlias, useStore } from "@/lib/store"
 import type { PlayNext, Project, Snapshot } from "@/lib/types"
 import { UpdateButton } from "./update-button"
+import { t } from "@/lib/i18n"
 
 export type ActionState =
   | { kind: "busy"; label: string }
@@ -45,7 +46,7 @@ export async function startPlay(repo: string) {
   const open = useStore.getState().open
   if (next.next === "presets") open({ kind: "presets", repo, choice: next.choice })
   else if (next.next === "saves") open({ kind: "saves", repo })
-  else toast("Starting…")
+  else toast(t("Starting…"))
 }
 
 export function PrimaryAction({ project: p }: { project: Project }) {
@@ -58,19 +59,19 @@ export function PrimaryAction({ project: p }: { project: Project }) {
       return (
         <Button variant="primary" size="lg" aria-busy aria-disabled tabIndex={-1} className="pointer-events-none relative overflow-hidden">
           <span className="absolute inset-0 animate-[busy_1.6s_linear_infinite] bg-[linear-gradient(110deg,transparent_30%,rgb(255_255_255/0.18)_50%,transparent_70%)] bg-[length:200%_100%]" />
-          <Spinner className="relative text-white" /> <span className="relative">{state.label}</span>
+          <Spinner className="relative text-white" /> <span className="relative">{t(state.label)}</span>
         </Button>
       )
     case "waiting":
       return (
         <Button variant="primary" size="lg" disabled>
-          <Spinner className="text-white" /> Waiting
+          <Spinner className="text-white" /> {t("Waiting")}
         </Button>
       )
     case "setup":
       return (
         <Button variant="primary" size="lg" onClick={() => open({ kind: "setup", repo: p.repo })}>
-          <Wrench /> Set up
+          <Wrench /> {t("Set up")}
         </Button>
       )
     case "install":
@@ -100,7 +101,7 @@ export function PrimaryAction({ project: p }: { project: Project }) {
     case "nothing":
       return (
         <Button variant="secondary" size="lg" disabled>
-          Built
+          {t("Built")}
         </Button>
       )
   }
@@ -120,39 +121,39 @@ export function ActionNote({ project: p }: { project: Project }) {
   let text: React.ReactNode
   switch (state.kind) {
     case "busy":
-      text = <>{snap.job.stage} · {link("View log", () => setTab("activity"))}</>
+      text = <>{t(shortStage(snap.job.stage))} · {link(t("View log"), () => setTab("activity"))}</>
       break
     case "waiting":
-      text = <>Waiting for {state.other} to finish.</>
+      text = <>{t("Waiting for {other} to finish.", { other: state.other })}</>
       break
     case "setup":
-      text = state.reason
+      text = t(state.reason)
       break
     case "install":
-      text = "Downloads and builds it on this PC once. The first build takes several minutes."
+      text = t("Downloads and builds it on this PC once. The first build takes several minutes.")
       break
     case "update":
-      text = <>A new version is out. {link("Play this version instead", () => void startPlay(p.repo))}</>
+      text = <>{t("A new version is out.")} {link(t("Play this version instead"), () => void startPlay(p.repo))}</>
       break
     case "play":
       text =
         snap.job.failed && snap.job.repo === p.repo ? (
           <>
-            {snap.job.stage} · {link("Fix and verify", () => void run({ type: "fix", repo: p.repo }))} · {link("View log", () => setTab("activity"))}
+            {t(shortStage(snap.job.stage))} · {link(t("Fix and verify"), () => void run({ type: "fix", repo: p.repo }))} · {link(t("View log"), () => setTab("activity"))}
           </>
         ) : p.activity ? (
-          [p.activity.updated_ago, p.activity.last_run ? `Last played ${p.activity.last_run}` : p.activity.pending].filter(Boolean).join(" · ")
+          [t(p.activity.updated_ago.replace(/^(Updated|Installed) /, "")), p.activity.last_run ? t("Last played {time}", { time: p.activity.last_run }) : t(p.activity.pending ?? "")].filter(Boolean).join(" · ")
         ) : p.standalone ? (
-          "Starts the installed program."
+          t("Starts the installed program.")
         ) : (
-          "Starts your installed build with your own game files."
+          t("Starts your installed build with your own game files.")
         )
       break
     case "stop":
-      text = <>Closes the game so it can save, then stops it if it is still running. · {link("View log", () => setTab("activity"))}</>
+      text = <>{t("Closes the game so it can save, then stops it if it is still running.")} · {link(t("View log"), () => setTab("activity"))}</>
       break
     case "nothing":
-      text = "This Rust workspace has no program to run."
+      text = t("This Rust workspace has no program to run.")
       break
   }
   // Going back to the build before the last update: offered next to the update and play notes.
@@ -160,7 +161,7 @@ export function ActionNote({ project: p }: { project: Project }) {
     p.previous_build !== null && (state.kind === "update" || state.kind === "play") ? (
       <p className="text-caption text-fg-3">
         {link(
-          p.previous_build ? `Restore previous build (commit ${shortCommit(p.previous_build)})` : "Restore previous build",
+          p.previous_build ? t("Restore previous build (commit {commit})", { commit: shortCommit(p.previous_build) ?? "" }) : t("Restore previous build"),
           () => void run({ type: "rollback", repo: p.repo }),
         )}
       </p>

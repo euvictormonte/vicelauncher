@@ -5,10 +5,11 @@ import { Switch } from "@/components/ui/switch"
 import { graphicsMode, MODES, OUTPUTS, withMode } from "@/lib/format"
 import { run } from "@/lib/store"
 import type { Graphics, Project } from "@/lib/types"
+import { t } from "@/lib/i18n"
 
 export function GraphicsTab({ project: p }: { project: Project }) {
   if (p.standalone) {
-    return <p className="text-body text-fg-3">This project runs on its own: graphics settings apply to builds that run the game.</p>
+    return <p className="text-body text-fg-3">{t("This project runs on its own: graphics settings apply to builds that run the game.")}</p>
   }
   const g = p.launch.graphics
   const set = (graphics: Graphics) => void run({ type: "set_project_graphics", repo: p.repo, graphics })

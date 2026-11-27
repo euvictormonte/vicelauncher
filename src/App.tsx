@@ -8,8 +8,10 @@ import { LibrarySkeleton, LibraryView } from "@/features/library/library-view"
 import { SettingsView } from "@/features/settings/settings-view"
 import { getBackend } from "@/lib/api"
 import { scheduleRefresh, useStore } from "@/lib/store"
+import { useLanguage } from "@/lib/i18n"
 
 export function App() {
+  useLanguage()
   const snap = useStore((s) => s.snap)
   const view = useStore((s) => s.view)
   useEffect(() => {

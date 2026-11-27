@@ -1,4 +1,5 @@
 import type { Project, SystemInfo } from "./types"
+import { t } from "./i18n"
 
 /**
  * How a build suits the player's PC, from what is known: the cards it was
@@ -93,37 +94,37 @@ export function assess(p: Project, system: SystemInfo | null): Assessment {
   const gpu = mainGpu(system)
   const match = matchesCard(p, system)
   const gpuCheck: Check = {
-    label: "Graphics card",
+    label: t("Graphics card"),
     value: gpu ? gpu.name.replace(/^(NVIDIA|AMD|Intel\(R\)) /, "") : "Unknown",
     level: match === true ? "good" : match === false ? "concern" : "unknown",
     note:
       match === true
-        ? `Made for ${gpu!.vendor} cards, like yours`
+        ? t("Made for {vendor} cards, like yours", { vendor: gpu!.vendor })
         : match === false
-          ? `Made for ${p.gpu.join(" and ")} cards`
+          ? t("Made for {gpu} cards", { gpu: p.gpu.join(t("and")) })
           : p.gpu.length === 0
-            ? "The author hasn't said which cards it runs on"
-            : `Made for ${p.gpu.join(" and ")} cards`,
+            ? t("The author hasn't said which cards it runs on")
+            : t("Made for {gpu} cards", { gpu: p.gpu.join(t("and")) }),
   }
   const memory = (label: string, have: number | null | undefined, used: number | null): Check => {
     const level: Level = have && used ? ratio(have, used) : "unknown"
     return {
       label,
-      value: have ? gb(have) : "Unknown",
+      value: have ? gb(have) : t("Unknown"),
       level,
       note: !used
-        ? "No usage reported"
+        ? t("No usage reported")
         : !have
-          ? `The author reported about ${gb(used)}`
+          ? t("The author reported about {amount}", { amount: gb(used) })
           : level === "good"
-            ? `Above the ${gb(used)} the author reported`
+            ? t("Above the {amount} the author reported", { amount: gb(used) })
             : level === "close"
-              ? `Close to the ${gb(used)} the author reported`
-              : `Below the ${gb(used)} the author reported`,
+              ? t("Close to the {amount} the author reported", { amount: gb(used) })
+              : t("Below the {amount} the author reported", { amount: gb(used) }),
     }
   }
-  const ram = memory("System memory", system?.ram_gb, p.reported.ram_gb)
-  const vram = memory("Video memory", gpu?.vram_gb, p.reported.vram_gb)
+  const ram = memory(t("System memory"), system?.ram_gb, p.reported.ram_gb)
+  const vram = memory(t("Video memory"), gpu?.vram_gb, p.reported.vram_gb)
   const checks = [gpuCheck, ram, vram]
   const level: Level = checks.some((c) => c.level === "concern")
     ? "concern"
@@ -135,22 +136,22 @@ export function assess(p: Project, system: SystemInfo | null): Assessment {
   const headline =
     level === "concern"
       ? gpuCheck.level === "concern"
-        ? `Made for ${p.gpu.join(" and ")}: it may not start, or run slowly, on your card.`
-        : "It may run slowly on your PC: it used more memory on the author's."
+        ? t("Made for {gpu}: it may not start, or run slowly, on your card.", { gpu: p.gpu.join(t("and")) })
+        : t("It may run slowly on your PC: it used more memory on the author's.")
       : level === "close"
-        ? "Close to what your PC has: it may run a little slower than the author's."
+        ? t("Close to what your PC has: it may run a little slower than the author's.")
         : level === "good"
-          ? "A good match for your PC, from what its author reported."
-          : "Not enough is known yet to compare it with your PC."
+          ? t("A good match for your PC, from what its author reported.")
+          : t("Not enough is known yet to compare it with your PC.")
   const warning =
     gpuCheck.level === "concern"
-      ? `Made for ${p.gpu.join(" and ")} cards, not ${gpu!.vendor}`
+      ? t("Made for {gpu} cards, not {vendor}", { gpu: p.gpu.join(t("and")), vendor: gpu!.vendor })
       : ram.level === "concern"
-        ? `Used ${gb(p.reported.ram_gb!)} of memory on the author's PC; yours has ${gb(system!.ram_gb!)}`
+        ? t("Used {used} of memory on the author's PC; yours has {have}", { used: gb(p.reported.ram_gb!), have: gb(system!.ram_gb!) })
         : vram.level === "concern"
-          ? `Used ${gb(p.reported.vram_gb!)} of video memory on the author's PC; yours has ${gb(gpu!.vram_gb!)}`
+          ? t("Used {used} of video memory on the author's PC; yours has {have}", { used: gb(p.reported.vram_gb!), have: gb(gpu!.vram_gb!) })
           : level === "close"
-            ? "Close to your PC's limits: it may run a little slower"
+            ? t("Close to your PC's limits: it may run a little slower")
             : null
   return { level, headline, warning, gpu: gpuCheck, ram, vram }
 }

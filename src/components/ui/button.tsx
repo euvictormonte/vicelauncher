@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 import type * as React from "react"
 import { cn } from "@/lib/utils"
+import { t, translateNode } from "@/lib/i18n"
 
 const buttonVariants = cva(
   "inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-[background-color,color,box-shadow,opacity,transform] duration-150 ease-out active:translate-y-px disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -34,7 +35,7 @@ export interface ButtonProps extends React.ComponentProps<"button">, VariantProp
 
 export function Button({ className, variant, size, asChild, ...props }: ButtonProps) {
   const Comp = asChild ? Slot.Root : "button"
-  return <Comp className={cn(buttonVariants({ variant, size }), className)} {...props} />
+  return <Comp className={cn(buttonVariants({ variant, size }), className)} {...props} aria-label={props["aria-label"] ? t(props["aria-label"]) : undefined} title={props.title ? t(props.title) : undefined}>{translateNode(props.children)}</Comp>
 }
 
 export { buttonVariants }

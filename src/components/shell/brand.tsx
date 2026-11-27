@@ -1,6 +1,7 @@
 import { PawPrint } from "lucide-react"
 import { useRef } from "react"
 import { toast } from "sonner"
+import { t } from "@/lib/i18n"
 import { pawsUnlocked, unlockPaws, useTheme } from "@/lib/theme"
 
 /** Neves Launcher wordmark. */
@@ -12,7 +13,7 @@ export function Brand() {
     clicks.current += 1
     if (clicks.current < 7 || pawsUnlocked()) return
     unlockPaws()
-    toast.success("A new look is unlocked. Find it in Settings, under Appearance.")
+    toast.success(t("A new look is unlocked. Find it in Settings, under Appearance."))
   }
   return (
     <div className="flex items-center gap-2">

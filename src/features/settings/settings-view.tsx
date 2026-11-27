@@ -13,6 +13,7 @@ import { useDraft } from "@/lib/hooks"
 import { pawsUnlocked, setTheme, THEMES, type Theme, useTheme } from "@/lib/theme"
 import { run, useStore } from "@/lib/store"
 import type { StorageView } from "@/lib/types"
+import { setLanguage, t as translate, useLanguage, useT } from "@/lib/i18n"
 
 export function SettingsView() {
   const snap = useStore((s) => s.snap)!
@@ -20,6 +21,8 @@ export function SettingsView() {
   const setScreenshot = useStore((s) => s.setScreenshot)
   const s = snap.settings
   const theme = useTheme()
+  const language = useLanguage()
+  const t = useT()
   const looks = [
     ...THEMES.map((t) => ({ value: t.id as string, label: t.label })),
     ...(pawsUnlocked() || theme === "paws" ? [{ value: "paws", label: "Paws" }] : []),
@@ -38,9 +41,15 @@ export function SettingsView() {
       <div className="drag h-12" />
       <div className="mx-auto max-w-[760px] space-y-10 px-10 pb-16">
         <header>
-          <h1 className="font-display text-page font-bold tracking-[-0.02em] text-fg">Settings</h1>
+          <h1 className="font-display text-page font-bold tracking-[-0.02em] text-fg">{t("Settings")}</h1>
           <p className="mt-1 text-body text-fg-3">{snap.brand.name} {snap.version}</p>
         </header>
+
+        <Group title="Language">
+          <Row label="App language" hint="The language choice is saved on this PC.">
+            <Segmented label="App language" size="sm" value={language} options={[{ value: "pt-BR", label: "Português (Brasil)" }, { value: "en", label: "English" }]} onChange={(v) => setLanguage(v as "pt-BR" | "en")} />
+          </Row>
+        </Group>
 
         <Group title="Appearance" description="Dark is the default. Light and calm are flat, with no glow. The look is remembered on this PC.">
           <Row label="Look" hint="Applies at once.">
@@ -55,13 +64,13 @@ export function SettingsView() {
         </Group>
 
         {screenshot ? (
-          <p className="text-body text-fg-3">The other settings are hidden in Screenshot mode.</p>
+          <p className="text-body text-fg-3">{t("The other settings are hidden in Screenshot mode.")}</p>
         ) : (
           <>
             <Group title="Game files" description="The folder with game_scarlett_master.exe from your own copy of the game. Neves Launcher never downloads game files.">
               <Row stacked label="Folder">
                 <Input value={gameDir} onChange={(e) => setGameDir(e.target.value)} placeholder="Paste the folder's path" className="font-mono text-secondary" aria-label="Game folder" />
-                <Button size="md" onClick={async () => { const d = await pickFolder("The folder with your game files"); if (d) void run({ type: "set_game_dir", path: d }) }}>
+                <Button size="md" onClick={async () => { const d = await pickFolder(t("The folder with your game files")); if (d) void run({ type: "set_game_dir", path: d }) }}>
                   <FolderOpen /> Choose…
                 </Button>
                 <Button size="md" variant="ghost" disabled={snap.files.searching} onClick={() => void run({ type: "find_game_files" })}>
@@ -74,7 +83,7 @@ export function SettingsView() {
             </Group>
 
             <Group title="Build tools" description="Projects are downloaded with Git and built with Rust and the C++ build tools, once, on this PC.">
-              <Row label={!snap.tools ? "Checking…" : snap.tools.ready ? "Git, Rust and the C++ build tools are ready" : `Missing ${snap.tools.missing.join(", ")}`} hint={snap.tools && !snap.tools.ready ? "Installs with winget; Windows asks for permission." : undefined}>
+              <Row label={!snap.tools ? "Checking…" : snap.tools.ready ? "Git, Rust and the C++ build tools are ready" : t("Missing {tools}", { tools: snap.tools.missing.join(", ") })} hint={snap.tools && !snap.tools.ready ? "Installs with winget; Windows asks for permission." : undefined}>
                 {snap.tools && !snap.tools.ready && <Button size="sm" variant="primary" disabled={busy} onClick={() => void run({ type: "install_tools" })}>Install missing tools</Button>}
                 {snap.tools?.ready && <Dot ok />}
               </Row>
@@ -82,8 +91,8 @@ export function SettingsView() {
 
             <div className="space-y-8">
               <div className="px-1">
-                <h2 className="font-display text-section font-semibold text-fg">Default graphics</h2>
-                <p className="mt-0.5 text-secondary text-fg-3">Every project uses these unless you change its own in its Graphics tab.</p>
+                <h2 className="font-display text-section font-semibold text-fg">{t("Default graphics")}</h2>
+                <p className="mt-0.5 text-secondary text-fg-3">{t("Every project uses these unless you change its own in its Graphics tab.")}</p>
               </div>
               <GraphicsGroups graphics={s.graphics} onChange={(graphics) => void run({ type: "set_default_graphics", graphics })} />
             </div>
@@ -105,7 +114,7 @@ export function SettingsView() {
 
             <Group title="Storage">
               <Row label="Install folder" hint={<span className="font-mono break-all" data-selectable>{s.workspace}</span>}>
-                <Button size="sm" disabled={busy} onClick={async () => { const d = await pickFolder("Where projects are downloaded and built"); if (d) void run({ type: "choose_install_dir", path: d }) }}>Change…</Button>
+                <Button size="sm" disabled={busy} onClick={async () => { const d = await pickFolder(t("Where projects are downloaded and built")); if (d) void run({ type: "choose_install_dir", path: d }) }}>Change…</Button>
                 {s.install_dir_custom && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run({ type: "use_default_install_dir" })}>Use default</Button>}
               </Row>
               <Row label="Background pictures" hint="Put .jpg or .png pictures here and they show behind every project.">
@@ -135,8 +144,8 @@ export function SettingsView() {
 
         <Group title="Updates">
           <Row
-            label={u.state === "available" ? `${u.tag} is available` : u.state === "downloaded" ? "The update is ready" : u.state === "checking" ? "Checking for updates…" : u.state === "downloading" ? "Downloading and verifying…" : u.state === "failed" ? "The update check failed" : "You're up to date"}
-            hint={u.restart_error ?? u.error ?? `Version ${snap.version}`}
+            label={u.state === "available" ? t("{version} is available", { version: u.tag }) : u.state === "downloaded" ? "The update is ready" : u.state === "checking" ? "Checking for updates…" : u.state === "downloading" ? "Downloading and verifying…" : u.state === "failed" ? "The update check failed" : "You're up to date"}
+            hint={u.restart_error ?? u.error ?? t("Version {version}", { version: snap.version })}
           >
             {u.state === "available" && <Button size="sm" variant="primary" disabled={busy} onClick={() => void run({ type: "download_update" })}>Update and restart</Button>}
             {u.state === "downloaded" && <Button size="sm" variant="primary" disabled={busy} onClick={() => void run({ type: "restart_to_update" })}>Restart now</Button>}
@@ -154,7 +163,7 @@ export function SettingsView() {
         </Group>
 
         <Group title="About">
-          <Row label={`${snap.brand.name} by the ${snap.brand.team}`} hint="The library comes from VIPortLive, built on PortWatch's tracker. The projects are their authors' work, built on VIctory by Marvisak and its contributors.">
+          <Row label={t("{name} by the {team}", { name: snap.brand.name, team: snap.brand.team })} hint="The library comes from VIPortLive, built on PortWatch's tracker. The projects are their authors' work, built on VIctory by Marvisak and its contributors.">
             <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.site)}><ExternalLink /> {snap.brand.site_label}</Button>
           </Row>
           <Row label="Forked from VILauncher" hint="VILauncher is based on Mandyhub by Zettrox. Free software under the GNU General Public License v3 or later. Redesign by ellion369; save picker, checkpoints, presets and build tracking by TheGameOnAddict.">
@@ -220,8 +229,8 @@ function DiskSpace() {
       description="What Neves Launcher keeps on this PC. Saves are always kept. Clearing a shader cache makes its next Play slow again while it is rebuilt."
     >
       <Row
-        label={view ? `${formatBytes(view.total_bytes)} in use` : "Measuring…"}
-        hint={view && `${formatBytes(view.other_bytes)} outside the projects (checkpoints, logs)${view.free_bytes != null ? `. ${formatBytes(view.free_bytes)} free on the drive` : ""}.`}
+        label={view ? t("{size} in use", { size: formatBytes(view.total_bytes) }) : t("Measuring…")}
+        hint={view && `${t("{size} outside the projects (checkpoints, logs)", { size: formatBytes(view.other_bytes) })}${view.free_bytes != null ? `. ${formatBytes(view.free_bytes)} ${t("free on the drive")}` : ""}.`}
       >
         <Button size="sm" variant="ghost" disabled={scanning} onClick={() => void scan()}>
           {scanning ? <Spinner /> : <RefreshCw />} Refresh
@@ -232,12 +241,12 @@ function DiskSpace() {
           <table className="w-full min-w-[560px] text-secondary">
             <thead>
               <tr className="text-left text-fg-3">
-                <th className="pb-2 font-normal">Project</th>
-                <th className="pb-2 text-right font-normal">Sources</th>
-                <th className="pb-2 text-right font-normal">Builds</th>
-                <th className="pb-2 text-right font-normal">Previous build</th>
-                <th className="pb-2 text-right font-normal">Shader cache</th>
-                <th className="pb-2 text-right font-normal">Saves (kept)</th>
+                <th className="pb-2 font-normal">{translate("Project")}</th>
+                <th className="pb-2 text-right font-normal">{translate("Sources")}</th>
+                <th className="pb-2 text-right font-normal">{translate("Builds")}</th>
+                <th className="pb-2 text-right font-normal">{translate("Previous build")}</th>
+                <th className="pb-2 text-right font-normal">{translate("Shader cache")}</th>
+                <th className="pb-2 text-right font-normal">{translate("Saves (kept)")}</th>
               </tr>
             </thead>
             <tbody>
@@ -283,13 +292,13 @@ function Dot({ ok }: { ok: boolean }) {
 
 function FilesStatus() {
   const f = useStore((s) => s.snap!.files)
-  if (!f.chosen) return <span className="text-secondary text-fg-3">No folder chosen</span>
-  if (f.ok) return <span className="flex items-center gap-2 text-secondary text-ok"><Dot ok /> All game files found</span>
-  if (f.unplugged) return <span className="flex items-center gap-2 text-secondary text-bad"><Dot ok={false} /> The drive with your game files is not connected</span>
-  if (f.empty) return <span className="flex items-center gap-2 text-secondary text-bad"><Dot ok={false} /> This folder is empty</span>
+  if (!f.chosen) return <span className="text-secondary text-fg-3">{translate("No folder chosen")}</span>
+  if (f.ok) return <span className="flex items-center gap-2 text-secondary text-ok"><Dot ok /> {translate("All game files found")}</span>
+  if (f.unplugged) return <span className="flex items-center gap-2 text-secondary text-bad"><Dot ok={false} /> {translate("The drive with your game files is not connected")}</span>
+  if (f.empty) return <span className="flex items-center gap-2 text-secondary text-bad"><Dot ok={false} /> {translate("This folder is empty")}</span>
   return (
     <span className="flex max-w-80 flex-wrap items-center justify-end gap-x-2 text-secondary text-bad">
-      <Dot ok={false} /> Missing <span className="font-mono text-caption text-fg-2">{f.missing.join(", ")}</span>
+      <Dot ok={false} /> {translate("Missing")} <span className="font-mono text-caption text-fg-2">{f.missing.join(", ")}</span>
     </span>
   )
 }

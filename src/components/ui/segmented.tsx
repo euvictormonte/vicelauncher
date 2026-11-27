@@ -2,6 +2,7 @@ import { motion } from "motion/react"
 import { ToggleGroup } from "radix-ui"
 import { useId } from "react"
 import { cn } from "@/lib/utils"
+import { t } from "@/lib/i18n"
 
 interface Props<T extends string> {
   value: T | null
@@ -18,7 +19,7 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
   return (
     <ToggleGroup.Root
       type="single"
-      aria-label={label}
+      aria-label={t(label)}
       value={value ?? ""}
       onValueChange={(v) => v && onChange(v as T)}
       className={cn("inline-flex rounded-md bg-fill-1 p-0.5 ring-1 ring-line ring-inset", className)}
@@ -39,7 +40,7 @@ export function Segmented<T extends string>({ value, options, onChange, classNam
               transition={{ type: "spring", duration: 0.25, bounce: 0.12 }}
             />
           )}
-          <span className="relative">{o.label}</span>
+          <span className="relative">{t(o.label)}</span>
         </ToggleGroup.Item>
       ))}
     </ToggleGroup.Root>

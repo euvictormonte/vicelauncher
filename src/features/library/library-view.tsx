@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { allProjects, run, useSelected, useStore } from "@/lib/store"
 import { Hero } from "./hero"
 import { ProjectTabs } from "./project-tabs"
+import { t } from "@/lib/i18n"
 
 export function LibraryView() {
   const snap = useStore((s) => s.snap)!
@@ -21,9 +22,9 @@ export function LibraryView() {
     // Image slot: a drawn scene for "the list didn't arrive" belongs above this text.
     return (
       <div className="relative flex h-full flex-col justify-end px-10 pb-16">
-        <h1 className="font-display text-page font-bold text-fg">The project list didn't arrive</h1>
+        <h1 className="font-display text-page font-bold text-fg">{t("The project list didn't arrive")}</h1>
         <p className="mt-2 max-w-[520px] text-lead text-fg-2">
-          Neves Launcher reads the list of community builds from viportlive.com. Check your connection, then try again.
+          {t("Neves Launcher reads the list of community builds from viportlive.com. Check your connection, then try again.")}
         </p>
         <div className="mt-6">
           <Button onClick={() => void run({ type: "refresh_projects" })}>Try again</Button>
@@ -43,7 +44,7 @@ export function LibraryView() {
 /** The library while the snapshot or the project list loads: the hero's shape, without art. */
 export function LibrarySkeleton() {
   return (
-    <div className="h-full overflow-hidden" aria-busy="true" aria-label="Loading the library">
+    <div className="h-full overflow-hidden" aria-busy="true" aria-label={t("Loading the library")}>
       <section className="relative shrink-0" style={{ height: "clamp(420px, 60vh, 620px)" }}>
         <div className="flex h-full max-w-[1280px] items-end justify-between gap-10 px-10 pt-16 pb-10">
           <div className="min-w-0 max-w-[640px] flex-1">

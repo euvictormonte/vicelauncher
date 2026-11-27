@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import { Tooltip } from "@/components/ui/tooltip"
 import { allProjects, run, useAlias, useStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
+import { shortStage } from "@/lib/format"
+import { t } from "@/lib/i18n"
 
 /** What the launcher is doing now, in the corner of the sidebar, like a download. */
 export function JobCard() {
@@ -66,7 +68,7 @@ export function JobCard() {
                 </button>
               )}
             </div>
-            <p className="mt-1 line-clamp-2 pl-6 text-caption text-fg-3">{job.stage}</p>
+            <p className="mt-1 line-clamp-2 pl-6 text-caption text-fg-3">{t(shortStage(job.stage))}</p>
             {job.running && (
               <div className="mt-2 ml-6 h-1 overflow-hidden rounded-full bg-fill-3">
                 {still ? (

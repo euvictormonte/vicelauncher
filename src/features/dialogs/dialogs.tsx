@@ -13,6 +13,7 @@ import { allProjects, run, useAlias, useStore } from "@/lib/store"
 import type { PlayChoice, PlayNext, SaveOption, SavesList } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { NoticeDialog } from "./notice-dialog"
+import { t } from "@/lib/i18n"
 
 /** Every dialog, opened from the store or by the launcher itself (a failed import, a move). */
 export function Dialogs() {
@@ -52,7 +53,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose(): void }) {
     try {
       const { act } = await import("@/lib/api")
       await act({ type: "add_repo_link", link })
-      toast.success("Added to your library")
+      toast.success(t("Added to your library"))
       onClose()
     } catch (e) {
       setError(String(e))
@@ -84,7 +85,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose(): void }) {
               variant="primary"
               disabled={busy}
               onClick={async () => {
-                const path = await pickFile("Import a build ZIP", [{ name: "Build ZIP", extensions: ["zip"] }])
+                const path = await pickFile(t("Import a build ZIP"), [{ name: t("Build ZIP"), extensions: ["zip"] }])
                 if (!path) return
                 // A ZIP holds a program that runs on this PC, so it gets the same warning as a repo.
                 if (acknowledged.includes("import-repo")) importZip(path)
@@ -162,7 +163,7 @@ function UninstallDialog({ repo, onClose }: { repo: string; onClose(): void }) {
     <Dialog
       open
       onOpenChange={(o) => !o && onClose()}
-      title={`Uninstall ${p ? alias(p).name : "this project"}?`}
+      title={t("Uninstall {name}?", { name: p ? alias(p).name : t("this project") })}
       description="This deletes its download, its build and its shader cache. Your saves stay, and you can install it again later."
       footer={
         <>
@@ -428,7 +429,7 @@ function SavesDialog({ repo, onClose }: { repo: string; onClose(): void }) {
               onClick={async () => {
                 const ok = await run({ type: "checkpoint", name: naming, source: option!.source! })
                 if (ok !== undefined) {
-                  toast.success("Added to favourites")
+                  toast.success(t("Added to favourites"))
                   setNaming(null)
                   void load({ tab: "favorites", title: naming.trim() })
                 }
@@ -463,7 +464,7 @@ function SavesDialog({ repo, onClose }: { repo: string; onClose(): void }) {
                     if (path) {
                       const name = await run<string>({ type: "import_save_zip", path })
                       if (name) {
-                        toast.success(`Imported “${name}” into favourites`)
+                        toast.success(t("Imported “{name}” into favourites", { name }))
                         void load({ tab: "favorites", title: name })
                       }
                     }

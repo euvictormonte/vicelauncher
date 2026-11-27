@@ -1,6 +1,7 @@
 import { DropdownMenu } from "radix-ui"
 import type * as React from "react"
 import { cn } from "@/lib/utils"
+import { translateNode } from "@/lib/i18n"
 
 export const Menu = DropdownMenu.Root
 export const MenuTrigger = DropdownMenu.Trigger
@@ -31,7 +32,7 @@ export function MenuItem({
         className,
       )}
       {...props}
-    />
+    >{translateNode(props.children)}</DropdownMenu.Item>
   )
 }
 

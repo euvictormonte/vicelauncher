@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { openUrl } from "@/lib/api"
 import { run, useStore } from "@/lib/store"
+import { t } from "@/lib/i18n"
 
 /** The release the player put off with "Later". Only that release is hidden; the next one shows. */
 const LATER = "vilauncher.launcher-update-later"
@@ -22,8 +23,8 @@ export function LauncherUpdate() {
     if (!u || u.state !== "available" || !u.tag) return
     if (localStorage.getItem(ANNOUNCED) === u.tag) return
     localStorage.setItem(ANNOUNCED, u.tag)
-    toast(`Neves Launcher ${u.tag} is out`, {
-      description: "Update now, or later from the sidebar.",
+    toast(t("Neves Launcher {version} is out", { version: u.tag }), {
+      description: t("Update now, or later from the sidebar."),
       duration: 12000,
       action: { label: "Update", onClick: () => void run({ type: "download_update" }) },
     })
@@ -35,7 +36,7 @@ export function LauncherUpdate() {
     if (localStorage.getItem(LATER) === tag) return null
     return (
       <Card>
-        <p className="text-caption text-fg-2">Neves Launcher {tag} is out</p>
+        <p className="text-caption text-fg-2">{t("Neves Launcher {version} is out", { version: tag })}</p>
         <div className="mt-2 flex flex-wrap gap-1.5">
           <Button size="sm" variant="primary" onClick={() => void run({ type: "download_update" })}>Update</Button>
           <Button
@@ -56,14 +57,14 @@ export function LauncherUpdate() {
   if (u.state === "downloading") {
     return (
       <Card>
-        <p className="flex items-center gap-2 text-caption text-fg-2"><Spinner className="size-3" /> Downloading {tag}</p>
+        <p className="flex items-center gap-2 text-caption text-fg-2"><Spinner className="size-3" /> {t("Downloading {version}", { version: tag })}</p>
       </Card>
     )
   }
   if (u.state === "downloaded") {
     return (
       <Card>
-        <p className="text-caption text-fg-2">{tag} is ready</p>
+        <p className="text-caption text-fg-2">{t("Update is ready: {version}", { version: tag })}</p>
         <div className="mt-2">
           <Button size="sm" variant="primary" onClick={() => void run({ type: "restart_to_update" })}>Restart now</Button>
         </div>

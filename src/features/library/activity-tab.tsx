@@ -6,6 +6,8 @@ import { Spinner } from "@/components/ui/spinner"
 import { copyText, getBackend, openUrl, saveFile } from "@/lib/api"
 import { run, useStore } from "@/lib/store"
 import type { Project, ReportView } from "@/lib/types"
+import { t } from "@/lib/i18n"
+import { shortStage } from "@/lib/format"
 
 /**
  * After a failed job: a GitHub issue for the launcher or the build's repo, with the log filled in.
@@ -24,7 +26,7 @@ function ReportBar({ project }: { project: Project }) {
   return (
     <div className="space-y-2 rounded-lg border border-line bg-fill-1 p-3">
       <p className="text-caption text-fg-2">
-        Report this to GitHub. The issue opens with the log filled in. Names and folders are removed, but read it before you submit: nothing is sent until you do.
+        {t("Report this to GitHub. The issue opens with the log filled in. Names and folders are removed, but read it before you submit: nothing is sent until you do.")}
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
@@ -57,7 +59,7 @@ function ReportBar({ project }: { project: Project }) {
           disabled={busy}
           onClick={async () => {
             const r = await fetchReport()
-            if (r) void copyText(r.text).then(() => toast.success("Report copied"))
+            if (r) void copyText(r.text).then(() => toast.success(t("Report copied")))
           }}
         >
           <Copy /> Copy report
@@ -91,7 +93,7 @@ export function ActivityTab({ project }: { project: Project }) {
   useEffect(() => {
     if (stick.current && box.current) box.current.scrollTop = box.current.scrollHeight
   }, [lines])
-  const status = !job.stage ? "Nothing running" : job.stage
+  const status = !job.stage ? t("Nothing running") : t(shortStage(job.stage))
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -106,7 +108,7 @@ export function ActivityTab({ project }: { project: Project }) {
           {job.stoppable && (
             <Button size="sm" variant="danger" onClick={() => void run({ type: "stop" })}><Square /> Stop</Button>
           )}
-          <Button size="sm" variant="ghost" disabled={!lines.length} onClick={() => void copyText(lines.join("\n")).then(() => toast.success("Log copied"))}><Copy /> Copy</Button>
+          <Button size="sm" variant="ghost" disabled={!lines.length} onClick={() => void copyText(lines.join("\n")).then(() => toast.success(t("Log copied")))}><Copy /> Copy</Button>
           <Button
             size="sm"
             variant="ghost"
@@ -121,9 +123,9 @@ export function ActivityTab({ project }: { project: Project }) {
         </div>
       </div>
       {job.failed && !job.running && <ReportBar project={project} />}
-      {omitted > 0 && <p className="text-caption text-fg-3">{omitted} earlier lines scrolled out of the log.</p>}
+      {omitted > 0 && <p className="text-caption text-fg-3">{t("{count} earlier lines scrolled out of the log.", { count: omitted })}</p>}
       <p className="text-caption text-fg-3">
-        Fix and verify checks every known problem, fixes the ones it can and checks each result. It reads the project's own notes for the switches it recommends, and can rebuild the program, install missing tools or lower settings; rendering and frame rate are not tuned beyond that.
+        {t("Fix and verify checks every known problem, fixes the ones it can and checks each result. It reads the project's own notes for the switches it recommends, and can rebuild the program, install missing tools or lower settings; rendering and frame rate are not tuned beyond that.")}
       </p>
       <pre
         ref={box}
@@ -134,7 +136,7 @@ export function ActivityTab({ project }: { project: Project }) {
         }}
         className="h-[420px] overflow-auto rounded-lg border border-line bg-black/35 p-4 font-mono text-caption leading-5 whitespace-pre-wrap text-fg-2"
       >
-        {lines.length ? lines.join("\n") : <span className="text-fg-4">The log of installs, builds and games shows here.</span>}
+        {lines.length ? lines.join("\n") : <span className="text-fg-4">{t("The log of installs, builds and games shows here.")}</span>}
       </pre>
     </div>
   )

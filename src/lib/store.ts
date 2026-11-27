@@ -2,6 +2,7 @@ import { toast } from "sonner"
 import { create } from "zustand"
 import { act as send, getBackend } from "./api"
 import type { Action, PlayChoice, Project, Snapshot } from "./types"
+import { t } from "./i18n"
 
 export type View = "library" | "settings"
 export type ProjectTab = "overview" | "graphics" | "launch" | "notes" | "activity"
@@ -63,11 +64,11 @@ export function scheduleRefresh() {
 export async function run<T = unknown>(action: Action, success?: string): Promise<T | undefined> {
   try {
     const value = await send<T>(action)
-    if (success) toast.success(success)
+    if (success) toast.success(t(success))
     scheduleRefresh()
     return value
   } catch (error) {
-    toast.error(String(error))
+    toast.error(t(String(error)))
     scheduleRefresh()
     return undefined
   }
@@ -93,6 +94,6 @@ export function useAlias() {
     if (!screenshot || !snap) return { name: p.name, repo: p.repo, owner: p.owner }
     const index = allProjects(snap).findIndex((q) => q.repo === p.repo) + 1
     const n = String(index).padStart(2, "0")
-    return { name: `Example project ${n}`, repo: `example/project-${n}`, owner: null }
+    return { name: t("Example project {number}", { number: n }), repo: `example/project-${n}`, owner: null }
   }
 }

@@ -3,6 +3,7 @@ import { motion } from "motion/react"
 import { Dialog as D } from "radix-ui"
 import type * as React from "react"
 import { cn } from "@/lib/utils"
+import { translateNode } from "@/lib/i18n"
 
 interface Props {
   open: boolean
@@ -45,17 +46,17 @@ export function Dialog({ open, onOpenChange, title, description, eyebrow, childr
           >
             <header className="flex items-start gap-4 px-6 pt-6">
               <div className="min-w-0 flex-1">
-                {eyebrow && <p className="mb-1 text-caption font-medium text-fg-3">{eyebrow}</p>}
-                <D.Title className="font-display text-section font-semibold tracking-[-0.01em] text-fg">{title}</D.Title>
-                {description && <D.Description className="mt-1.5 text-body text-fg-2">{description}</D.Description>}
+                {eyebrow && <p className="mb-1 text-caption font-medium text-fg-3">{translateNode(eyebrow)}</p>}
+                <D.Title className="font-display text-section font-semibold tracking-[-0.01em] text-fg">{translateNode(title)}</D.Title>
+                {description && <D.Description className="mt-1.5 text-body text-fg-2">{translateNode(description)}</D.Description>}
               </div>
               {dismissable && <D.Close className="-mt-1 -mr-2 grid size-8 shrink-0 cursor-pointer place-items-center rounded-md text-fg-3 transition-colors hover:bg-fill-2 hover:text-fg">
                 <X className="size-4" />
-                <span className="sr-only">Close</span>
+                <span className="sr-only">{translateNode("Close")}</span>
               </D.Close>}
             </header>
-            {children && <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-1">{children}</div>}
-            {footer && <footer className="flex flex-row-reverse items-center gap-2 px-6 pt-5 pb-6">{footer}</footer>}
+            {children && <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-1">{translateNode(children)}</div>}
+            {footer && <footer className="flex flex-row-reverse items-center gap-2 px-6 pt-5 pb-6">{translateNode(footer)}</footer>}
           </motion.div>
         </D.Content>
       </D.Portal>

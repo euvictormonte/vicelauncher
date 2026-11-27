@@ -10,6 +10,7 @@ import { UpdateButton } from "./update-button"
 import { run, useAlias, useStore } from "@/lib/store"
 import type { Project } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { t } from "@/lib/i18n"
 
 export function OverviewTab({ project: p }: { project: Project }) {
   const screenshot = useStore((s) => s.screenshot)
@@ -22,8 +23,8 @@ export function OverviewTab({ project: p }: { project: Project }) {
           <div className="flex items-center gap-4 rounded-lg border border-warn/25 bg-warn/8 px-4 py-3">
             <RefreshCw className="size-4 shrink-0 text-warn" />
             <div className="min-w-0 flex-1">
-              <p className="text-body font-medium text-fg">A new build is out</p>
-              <p className="text-caption text-fg-3">{screenshot ? "Version hidden" : `Version ${shortCommit(p.update)} · you have ${shortCommit(p.built) ?? "an older one"}`}</p>
+              <p className="text-body font-medium text-fg">{t("A new build is out")}</p>
+              <p className="text-caption text-fg-3">{screenshot ? t("Version hidden") : t("Version {version} · you have {built}", { version: shortCommit(p.update) ?? "", built: shortCommit(p.built) ?? t("an older one") })}</p>
             </div>
             <Button size="sm" variant="ghost" onClick={() => void run({ type: "later", repo: p.repo, remote: p.update! })}>Later</Button>
             <UpdateButton repo={p.repo} size="sm" variant="primary" disabled={busy}>Update now</UpdateButton>
@@ -36,11 +37,11 @@ export function OverviewTab({ project: p }: { project: Project }) {
           </div>
         )}
         <section>
-          <h2 className="font-display text-section font-semibold tracking-[-0.01em] text-fg">About</h2>
+          <h2 className="font-display text-section font-semibold tracking-[-0.01em] text-fg">{t("About")}</h2>
           <p className="mt-3 max-w-[68ch] text-lead text-fg-2" data-selectable>
             {screenshot
               ? "Project description hidden."
-              : aboutText(p.summary) || (p.kind === "zip" ? "A prebuilt build you imported from a ZIP." : p.kind === "local" ? "A build from a folder on this PC." : "The tracker has no write-up for this build yet.")}
+              : aboutText(p.summary) || (p.kind === "zip" ? t("A prebuilt build you imported from a ZIP.") : p.kind === "local" ? t("A build from a folder on this PC.") : t("The tracker has no write-up for this build yet."))}
           </p>
         </section>
         {!screenshot && p.highlights.length > 0 && (
@@ -73,12 +74,12 @@ export function OverviewTab({ project: p }: { project: Project }) {
 function List({ title, items, mark }: { title: string; items: string[]; mark: React.ReactNode }) {
   return (
     <section>
-      <h3 className="text-lead font-semibold text-fg">{title}</h3>
+      <h3 className="text-lead font-semibold text-fg">{t(title)}</h3>
       <ul className="mt-3 max-w-[68ch] space-y-2" data-selectable>
         {items.map((item) => (
           <li key={item} className="flex gap-3 text-body text-fg-2">
             <span className="grid h-5 w-4 shrink-0 place-items-center">{mark}</span>
-            <span className="min-w-0">{item}</span>
+            <span className="min-w-0">{t(item)}</span>
           </li>
         ))}
       </ul>
@@ -114,7 +115,7 @@ function YourPc({ project: p }: { project: Project }) {
   const offerFilter = system && a.level === "concern" && matchesCard(p, system) === false && filter !== target
   return (
     <section className="space-y-2">
-      <h3 className="px-1 text-body font-semibold text-fg">Your PC</h3>
+      <h3 className="px-1 text-body font-semibold text-fg">{t("Your PC")}</h3>
       {!system ? (
         <div className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-fill-1" aria-busy aria-label="Looking at your PC">
           <div className="px-4 py-3">
@@ -145,7 +146,7 @@ function YourPc({ project: p }: { project: Project }) {
           )}
         </div>
       )}
-      <p className="px-1 text-caption text-fg-4">Memory figures are what the author's PC used while playing, not a minimum requirement.</p>
+      <p className="px-1 text-caption text-fg-4">{t("Memory figures are what the author's PC used while playing, not a minimum requirement.")}</p>
     </section>
   )
 }
@@ -156,12 +157,12 @@ function CheckRow({ check: c }: { check: CompatCheck }) {
       <span className="grid h-5 w-4 shrink-0 place-items-center">{MARK[c.level]}</span>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-4">
-          <span className="shrink-0 text-body text-fg">{c.label}</span>
+          <span className="shrink-0 text-body text-fg">{t(c.label)}</span>
           <span className={cn("min-w-0 truncate text-right text-body", c.value === "Unknown" ? "text-fg-4" : "text-fg-2")} title={c.value}>
             {c.value}
           </span>
         </div>
-        <p className="mt-0.5 text-caption text-fg-3">{c.note}</p>
+        <p className="mt-0.5 text-caption text-fg-3">{t(c.note)}</p>
       </div>
     </div>
   )

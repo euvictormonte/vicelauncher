@@ -12,6 +12,7 @@ import type { Project } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { ActionNote, PrimaryAction } from "./primary-action"
 import { useUpdateWarning } from "./update-button"
+import { t } from "@/lib/i18n"
 
 /**
  * The summary's first sentence, whole, or nothing: never cut mid-word. Too
@@ -29,7 +30,7 @@ export function Hero({ project: p }: { project: Project }) {
   const screenshot = useStore((s) => s.screenshot)
   const alias = useAlias()(p)
   const playing = snap.job.running && snap.job.stage === "Playing"
-  const source = p.kind === "zip" ? "Imported build" : p.custom ? "Added by link" : "VIPortLive"
+  const source = p.kind === "zip" ? t("Imported build") : p.custom ? t("Added by link") : "VIPortLive"
   const lead = screenshot ? null : leadSentence(p.summary)
   return (
     <section className="relative isolate shrink-0" style={{ minHeight: "clamp(360px, 50vh, 520px)" }}>
@@ -43,7 +44,7 @@ export function Hero({ project: p }: { project: Project }) {
               {p.verified && (
                 <>
                   <span className="text-fg-4">·</span>
-                  <span className="inline-flex items-center gap-1"><BadgeCheck className="size-4" /> Verified</span>
+                  <span className="inline-flex items-center gap-1"><BadgeCheck className="size-4" /> {t("Verified")}</span>
                 </>
               )}
             </p>
@@ -58,7 +59,7 @@ export function Hero({ project: p }: { project: Project }) {
           <PrimaryAction project={p} />
           {p.web_url && !screenshot && (
             <Tooltip label="Open repository">
-              <Button variant="secondary" size="icon-lg" aria-label="Open repository" onClick={() => openUrl(p.web_url!).catch((error) => toast.error(String(error)))}>
+              <Button variant="secondary" size="icon-lg" aria-label="Open repository" onClick={() => openUrl(p.web_url!).catch((error) => toast.error(t(String(error))))}>
                 <ExternalLink />
               </Button>
             </Tooltip>
@@ -77,10 +78,10 @@ export function Hero({ project: p }: { project: Project }) {
 function Stats({ project: p }: { project: Project }) {
   const f = fps(p)
   const stats: { value: string; label: string; tip?: string }[] = []
-  if (f != null) stats.push({ value: `${f} fps`, label: "Average" })
+  if (f != null) stats.push({ value: `${f} fps`, label: t("Average") })
   if (p.render != null && (p.render > 0 || f != null))
-    stats.push({ value: `${Math.round(p.render * 100)}%`, label: "Picture accuracy", tip: "How close the picture is to the console version, as rated on VIPortLive." })
-  if (p.gpu.length) stats.push({ value: gpuText(p.gpu), label: "Made for" })
+    stats.push({ value: `${Math.round(p.render * 100)}%`, label: t("Picture accuracy"), tip: t("How close the picture is to the console version, as rated on VIPortLive.") })
+  if (p.gpu.length) stats.push({ value: gpuText(p.gpu), label: t("Made for") })
   if (!stats.length) return null
   return (
     <dl className="mt-6 flex flex-wrap items-stretch gap-y-3">
@@ -137,8 +138,8 @@ function MoreMenu({ project: p }: { project: Project }) {
           <MenuItem
             onSelect={() =>
               copyText(p.web_url!)
-                .then(() => toast.success("Link copied"))
-                .catch((error) => toast.error(String(error)))
+                .then(() => toast.success(t("Link copied")))
+                .catch((error) => toast.error(t(String(error))))
             }
           >
             <Copy /> Copy link

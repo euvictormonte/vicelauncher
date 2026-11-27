@@ -19,6 +19,7 @@ import { Brand } from "./brand"
 import { LauncherUpdate } from "@/features/shared/launcher-update"
 import { JobCard } from "./job-card"
 import { Bone, SidebarSkeleton } from "./skeleton"
+import { t } from "@/lib/i18n"
 
 const FILTERS = [
   { value: "0", label: "All" },
@@ -88,8 +89,8 @@ export function Sidebar() {
         <Brand />
       </div>
       <nav className="space-y-1 px-2 pt-1" aria-label="Pages">
-        <NavItem icon={<LayoutGrid />} label="Library" active={view === "library"} onClick={() => setView("library")} />
-        <NavItem icon={<Settings2 />} label="Settings" active={view === "settings"} onClick={() => setView("settings")} />
+        <NavItem icon={<LayoutGrid />} label={t("Library")} active={view === "library"} onClick={() => setView("library")} />
+        <NavItem icon={<Settings2 />} label={t("Settings")} active={view === "settings"} onClick={() => setView("settings")} />
       </nav>
       <div className="flex items-center gap-1.5 px-2 pt-4">
         <label className="relative block min-w-0 flex-1">
@@ -99,8 +100,8 @@ export function Sidebar() {
             value={screenshot ? "" : search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={onSearchKey}
-            placeholder="Search library"
-            aria-label="Search library"
+            placeholder={t("Search library")}
+            aria-label={t("Search library")}
             aria-controls="sidebar-projects"
             spellCheck={false}
             className="h-8 w-full rounded-md border border-line bg-fill-1 pr-3 pl-9 text-secondary text-fg placeholder:text-fg-3 transition-colors hover:border-line-2 focus-visible:border-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/25"
@@ -111,7 +112,7 @@ export function Sidebar() {
       <div
         ref={listRef}
         id="sidebar-projects"
-        aria-label="Projects"
+        aria-label={t("Projects")}
         aria-busy={loading || undefined}
         onKeyDown={onListKey}
         className="min-h-0 flex-1 overflow-y-auto px-2 pb-4"
@@ -119,7 +120,7 @@ export function Sidebar() {
         {loading && <SidebarSkeleton />}
         {snap?.list.status === "error" && (
           <div className="mt-4 rounded-lg border border-line bg-fill-1 p-3">
-            <p className="text-secondary text-fg-2">{screenshot ? "The project list could not load." : snap.list.error}</p>
+            <p className="text-secondary text-fg-2">{screenshot ? t("The project list could not load.") : snap.list.error}</p>
             <Button size="sm" className="mt-2" onClick={() => void run({ type: "refresh_projects" })}>Try again</Button>
           </div>
         )}
@@ -135,7 +136,7 @@ export function Sidebar() {
           ))}
         {snap?.list.status === "ready" && order.length === 0 && (
           <div className="px-2 pt-6">
-            <p className="text-secondary text-fg-2">{query ? `No project matches “${search.trim()}”.` : "No projects for this card yet."}</p>
+            <p className="text-secondary text-fg-2">{query ? t("No project matches “{query}”.", { query: search.trim() }) : t("No projects for this card yet.")}</p>
             {query ? (
               <Button variant="ghost" size="sm" className="mt-2 -ml-3" onClick={() => setSearch("")}>Clear search</Button>
             ) : filter !== 0 ? (
@@ -227,11 +228,11 @@ function FilterMenu({ snap }: { snap: Snapshot }) {
           className="z-50 max-h-[min(640px,80vh)] w-[248px] space-y-4 overflow-y-auto rounded-xl border border-line-2 bg-raised p-3.5 text-body text-fg shadow-[0_12px_36px_rgb(0_0_0/0.5)] outline-none"
         >
           <label className="flex items-center justify-between gap-3">
-            <span>Show taken-down projects</span>
+            <span>{t("Show taken-down projects")}</span>
             <Switch checked={s.show_nuked} onCheckedChange={(v) => setList({ show_nuked: v })} aria-label="Show taken-down projects" />
           </label>
           <div className="space-y-1.5">
-            <span className="text-caption font-semibold text-fg-2">Sort</span>
+            <span className="text-caption font-semibold text-fg-2">{t("Sort")}</span>
             <Select
               label="Sort"
               value={String(s.list_sort)}
@@ -241,7 +242,7 @@ function FilterMenu({ snap }: { snap: Snapshot }) {
             />
           </div>
           <div className="space-y-1.5">
-            <span className="text-caption font-semibold text-fg-2">Tier</span>
+            <span className="text-caption font-semibold text-fg-2">{t("Tier")}</span>
             <Segmented
               label="Tier"
               size="sm"
@@ -252,7 +253,7 @@ function FilterMenu({ snap }: { snap: Snapshot }) {
             />
           </div>
           <div className="space-y-1.5">
-            <span className="text-caption font-semibold text-fg-2">Graphics cards</span>
+            <span className="text-caption font-semibold text-fg-2">{t("Graphics cards")}</span>
             <Segmented
               label="Graphics cards"
               size="sm"
@@ -269,7 +270,7 @@ function FilterMenu({ snap }: { snap: Snapshot }) {
               onClick={() => setAdvanced(!advanced)}
               className="flex w-full items-center justify-between text-caption font-semibold text-fg-2 hover:text-fg"
             >
-              Advanced: by PC spec
+              {t("Advanced: by PC spec")}
               <span aria-hidden>{advanced ? "−" : "+"}</span>
             </button>
             {advanced && <SpecFields snap={snap} />}
@@ -302,7 +303,7 @@ function SpecFields({ snap }: { snap: Snapshot }) {
   const save = (ram_gb: number | null, vram_gb: number | null) => void run({ type: "set_spec", ram_gb, vram_gb })
   return (
     <div className="space-y-2">
-      <p className="text-caption text-fg-3">Builds are judged against these numbers. Leave a box empty to use what the launcher found.</p>
+      <p className="text-caption text-fg-3">{t("Builds are judged against these numbers. Leave a box empty to use what the launcher found.")}</p>
       <SpecInput label="System memory (GB)" value={s.spec_ram_gb} detected={ram} onCommit={(v) => save(v, s.spec_vram_gb)} />
       <SpecInput label="Video memory (GB)" value={s.spec_vram_gb} detected={vram} onCommit={(v) => save(s.spec_ram_gb, v)} />
     </div>
@@ -350,7 +351,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <section aria-labelledby={id} className="pt-6 first:pt-4">
       <h2 id={id} className="px-2 pb-1 text-caption font-semibold tracking-[0.01em] text-fg-2">
-        {title}
+        {t(title)}
       </h2>
       <ul role="list">{children}</ul>
     </section>
@@ -382,7 +383,7 @@ function Row({ project: p, snap, tabbable, onFocus }: { project: Project; snap: 
   let line: React.ReactNode
   let tone = "text-fg-3"
   if (working) {
-    line = <><Spinner className="size-3 text-accent-fg" /> {shortStage(snap.job.stage)}</>
+    line = <><Spinner className="size-3 text-accent-fg" /> {t(shortStage(snap.job.stage))}</>
     tone = "text-accent-fg"
   } else if (p.listing.nuked) {
     line = "Taken down · open on VIPortLive"
@@ -431,7 +432,7 @@ function Row({ project: p, snap, tabbable, onFocus }: { project: Project; snap: 
           {p.verified && <BadgeCheck aria-label="Verified" className="size-3.5 shrink-0 text-fg-3" />}
           {p.activity?.pending && !working && <span className="ml-1 size-1.5 shrink-0 rounded-full bg-fg-2" aria-label={p.activity.pending} />}
         </span>
-        <span className={cn("flex items-center gap-1 truncate text-caption", tone)}>{line}</span>
+        <span className={cn("flex items-center gap-1 truncate text-caption", tone)}>{typeof line === "string" ? t(line) : line}</span>
       </span>
     </button>
   )

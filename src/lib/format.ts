@@ -1,4 +1,5 @@
 import type { Graphics, OutputResolution, Project } from "./types"
+import { t } from "./i18n"
 
 /** The graphics modes: Series S profile and render scale. */
 export const MODES = [
@@ -40,13 +41,13 @@ export function shortCommit(c: string | null | undefined) {
 
 /** A short stage for small places ("Building" for "Building (the first time…)"). */
 export function shortStage(stage: string) {
-  if (stage.startsWith("Downloading")) return "Downloading"
-  if (stage.startsWith("Building")) return "Building"
-  if (stage.startsWith("Warming")) return "Warming up"
-  if (stage.startsWith("Installing")) return "Installing tools"
-  if (stage.startsWith("Uninstalling")) return "Uninstalling"
-  if (stage.startsWith("Moving")) return "Moving"
-  if (stage.startsWith("Extracting")) return "Importing"
-  if (stage === "Playing") return "Playing"
+  if (stage.startsWith("Downloading")) return t("Downloading")
+  if (stage.startsWith("Building")) return t("Building")
+  if (stage.startsWith("Warming")) return t("Warming up")
+  if (stage.startsWith("Installing")) return t("Installing tools")
+  if (stage.startsWith("Uninstalling")) return t("Uninstalling")
+  if (stage.startsWith("Moving")) return t("Moving")
+  if (stage.startsWith("Extracting")) return t("Importing")
+  if (stage === "Playing") return t("Playing")
   return stage
 }

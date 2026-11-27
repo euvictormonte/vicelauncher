@@ -1,12 +1,12 @@
 import legal from "../../../LEGAL.md?raw"
+import legalPt from "../../../LEGAL.pt-BR.md?raw"
 import { Button } from "@/components/ui/button"
 import { Dialog } from "@/components/ui/dialog"
 import { inTauri } from "@/lib/api"
 import { run, useStore } from "@/lib/store"
+import { useLanguage } from "@/lib/i18n"
 
 /** LEGAL.md, the one source of the notice (also in the README and the installer). */
-const paragraphs = legal.trim().split(/\n\s*\n/).slice(1)
-
 function Paragraph({ text }: { text: string }) {
   // "1. You must provide the build. Rest…": the lead sentence carries the point.
   const m = text.match(/^(\d+)\.\s+([^.]+\.)\s*([\s\S]*)$/)
@@ -26,6 +26,8 @@ function Paragraph({ text }: { text: string }) {
  * library opens (no way around it but Quit); from Settings it is only read.
  */
 export function NoticeDialog() {
+  const language = useLanguage()
+  const paragraphs = (language === "pt-BR" ? legalPt : legal).trim().split(/\n\s*\n/).slice(1)
   const accepted = useStore((s) => s.snap?.notice_accepted ?? true)
   const dialog = useStore((s) => s.dialog)
   const open = useStore((s) => s.open)
