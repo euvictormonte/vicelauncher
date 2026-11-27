@@ -14,16 +14,17 @@ interface Props {
   children?: React.ReactNode
   footer?: React.ReactNode
   className?: string
+  overlayClassName?: string
   /** False: no close button, and Escape or a click outside do nothing (a question that needs an answer). */
   dismissable?: boolean
 }
 
 /** A dialog over the dimmed window: glass, 16 px corners, Escape or a click outside closes it. */
-export function Dialog({ open, onOpenChange, title, description, eyebrow, children, footer, className, dismissable = true }: Props) {
+export function Dialog({ open, onOpenChange, title, description, eyebrow, children, footer, className, overlayClassName, dismissable = true }: Props) {
   return (
     <D.Root open={open} onOpenChange={onOpenChange}>
       <D.Portal>
-        <D.Overlay className="fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] animate-[fade-in_180ms_ease-out]" />
+        <D.Overlay className={cn("fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] animate-[fade-in_180ms_ease-out]", overlayClassName)} />
         <D.Content
           asChild
           onEscapeKeyDown={(e) => !dismissable && e.preventDefault()}

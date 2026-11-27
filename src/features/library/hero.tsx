@@ -33,7 +33,7 @@ export function Hero({ project: p }: { project: Project }) {
   const source = p.kind === "zip" ? t("Imported build") : p.custom ? t("Added by link") : "VIPortLive"
   const lead = screenshot ? null : leadSentence(p.summary)
   return (
-    <section className="relative isolate shrink-0" style={{ minHeight: "clamp(360px, 50vh, 520px)" }}>
+    <section className="relative isolate shrink-0" style={{ minHeight: "clamp(350px, 38vh, 430px)" }}>
       <Aurora seed={p.repo} still={playing} pictures={screenshot ? [] : snap.backgrounds} art={alias.owner ? avatarUrl(alias.owner, 256) : null} />
       <div className="relative z-10 flex h-full min-h-[inherit] max-w-[1280px] flex-col justify-end px-10 pt-16 pb-8">
         <div className="flex items-end gap-6">

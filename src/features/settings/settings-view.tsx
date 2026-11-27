@@ -14,6 +14,7 @@ import { pawsUnlocked, setTheme, THEMES, type Theme, useTheme } from "@/lib/them
 import { run, useStore } from "@/lib/store"
 import type { StorageView } from "@/lib/types"
 import { setLanguage, t as translate, useLanguage, useT } from "@/lib/i18n"
+import { getNickname, saveNickname } from "@/lib/profile"
 
 export function SettingsView() {
   const snap = useStore((s) => s.snap)!
@@ -28,6 +29,8 @@ export function SettingsView() {
     ...(pawsUnlocked() || theme === "paws" ? [{ value: "paws", label: "Paws" }] : []),
   ]
   const [askAgents, setAskAgents] = useState(false)
+  const [nickname, setNicknameDraft] = useState(getNickname)
+  const [discordInfo, setDiscordInfo] = useState(false)
   // Turning agents on needs the warning once; the switch only moves after Continue.
   const turnOnAgents = () =>
     s.acknowledged.includes("agent-access") ? void run({ type: "set_agent_access", enabled: true }) : setAskAgents(true)
@@ -50,6 +53,18 @@ export function SettingsView() {
             <Segmented label="App language" size="sm" value={language} options={[{ value: "pt-BR", label: "Português (Brasil)" }, { value: "en", label: "English" }]} onChange={(v) => setLanguage(v as "pt-BR" | "en")} />
           </Row>
         </Group>
+
+        {!screenshot && <Group title="Profile">
+          <Row label="Name or nickname" hint="Personalizes the welcome message on this PC.">
+            <form className="flex items-center gap-2" onSubmit={(event) => { event.preventDefault(); if (saveNickname(nickname)) setNicknameDraft(nickname.trim().slice(0, 32)) }}>
+              <Input value={nickname} onChange={(event) => setNicknameDraft(event.target.value)} maxLength={32} placeholder="Name or nickname" aria-label="Name or nickname" />
+              <Button type="submit" size="sm" disabled={!nickname.trim()}>{t("Save name")}</Button>
+            </form>
+          </Row>
+          <Row label="Discord" hint={discordInfo ? "Discord sign-in needs an OAuth app and callback configured for this launcher." : "Connect a Discord account to use its profile name."}>
+            <Button type="button" size="sm" variant="secondary" onClick={() => setDiscordInfo(true)}>{t("Continue with Discord")}</Button>
+          </Row>
+        </Group>}
 
         <Group title="Appearance" description="Dark is the default. Light and calm are flat, with no glow. The look is remembered on this PC.">
           <Row label="Look" hint="Applies at once.">

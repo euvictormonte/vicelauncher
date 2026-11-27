@@ -5,6 +5,7 @@ import { WindowControls } from "@/components/shell/window-controls"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Dialogs } from "@/features/dialogs/dialogs"
 import { LibrarySkeleton, LibraryView } from "@/features/library/library-view"
+import { HomeSkeleton, HomeView } from "@/features/home/home-view"
 import { SettingsView } from "@/features/settings/settings-view"
 import { getBackend } from "@/lib/api"
 import { scheduleRefresh, useStore } from "@/lib/store"
@@ -31,7 +32,15 @@ export function App() {
           <div className="drag absolute inset-x-0 top-0 z-30 flex h-10 justify-end">
             <WindowControls />
           </div>
-          {!snap ? view === "library" && <LibrarySkeleton /> : view === "library" ? <LibraryView /> : <SettingsView />}
+          {!snap ? (
+            view === "library" ? <LibrarySkeleton /> : view === "home" ? <HomeSkeleton /> : null
+          ) : view === "home" ? (
+            <HomeView />
+          ) : view === "library" ? (
+            <LibraryView />
+          ) : (
+            <SettingsView />
+          )}
         </main>
       </div>
       <Dialogs />

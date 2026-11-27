@@ -4,7 +4,7 @@ import { act as send, getBackend } from "./api"
 import type { Action, PlayChoice, Project, Snapshot } from "./types"
 import { t } from "./i18n"
 
-export type View = "library" | "settings"
+export type View = "home" | "library" | "settings"
 export type ProjectTab = "overview" | "graphics" | "launch" | "notes" | "activity"
 
 export type Dialog =
@@ -33,7 +33,7 @@ interface State {
 
 export const useStore = create<State>((set) => ({
   snap: null,
-  view: "library",
+  view: "home",
   search: "",
   tab: "overview",
   screenshot: false,

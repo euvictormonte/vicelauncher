@@ -1,4 +1,4 @@
-import { BadgeCheck, LayoutGrid, Plus, Search, Settings2, SlidersHorizontal } from "lucide-react"
+import { BadgeCheck, House, LayoutGrid, Plus, Search, Settings2, SlidersHorizontal } from "lucide-react"
 import { motion } from "motion/react"
 import { useEffect, useId, useRef, useState } from "react"
 import { Popover } from "radix-ui"
@@ -89,6 +89,7 @@ export function Sidebar() {
         <Brand />
       </div>
       <nav className="space-y-1 px-2 pt-1" aria-label="Pages">
+        <NavItem icon={<House />} label={t("Home")} active={view === "home"} onClick={() => setView("home")} />
         <NavItem icon={<LayoutGrid />} label={t("Library")} active={view === "library"} onClick={() => setView("library")} />
         <NavItem icon={<Settings2 />} label={t("Settings")} active={view === "settings"} onClick={() => setView("settings")} />
       </nav>
