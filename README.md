@@ -8,7 +8,7 @@
   <a href="https://github.com/euvictormonte/vicelauncher/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/euvictormonte/vicelauncher?color=ff4fa8&cacheSeconds=300"></a>
 </p>
 
-A Windows launcher for community game projects. It lists projects from [VIPortLive](https://viportlive.com), downloads and builds them with Git and Cargo, and starts them with **your own copy of the game files**.
+A Windows and Linux launcher for community game projects. It lists projects from [VIPortLive](https://viportlive.com), downloads and builds them with Git and Cargo, and starts them with **your own copy of the game files**.
 
 ![Neves Launcher library: recommended builds, filters and a project's overview](assets/screenshots/library.png)
 
@@ -75,17 +75,28 @@ The screenshots use example data from the browser mock, not a real PC or account
 
 ## Requirements
 
-- Windows 10 or 11, 64-bit
-- WebView2, which ships with Windows 10 and 11 (the installer fetches it if missing)
+- Windows 10 or 11, 64-bit, with WebView2 (it ships with Windows 10 and 11; the installer fetches it if missing)
+- or Linux, x86-64, with WebKitGTK 4.1 (Fedora, Ubuntu 22.04+, Debian 12+, Arch and openSUSE ship it)
 - Your own copy of any game a project needs
 - To build Rust projects: Git, Rust and the C++ build tools (Neves Launcher can install them)
+
+## Linux
+
+Download the AppImage, the `.deb` or the `.rpm` from [Releases](https://github.com/euvictormonte/vicelauncher/releases/latest). The AppImage updates itself like the Windows exe; the deb and rpm update with your system's packages.
+
+- **Build tools.** *Install missing tools* installs Git and gcc with your package manager (dnf, apt, pacman or zypper) through `pkexec`, so the desktop asks for your password, then Rust with rustup for your user only.
+- **Builds.** Projects are built for Linux with Cargo, so the program is `victory`, not `victory.exe`. A project that only builds on Windows fails to build here; its log says why.
+- **Windows programs.** A prebuilt Windows build from a ZIP, or a `.exe` already on your PC, runs through `umu-run` (Proton outside Steam) or Wine, whichever is installed, in a Wine prefix under the install folder (`wine/`). Set `NEVES_WINE` to use another runner. On Fedora: `sudo dnf install wine` or `umu-launcher`.
+- **Game files.** *Find* looks in your home folder, Steam's `steamapps/common`, `~/Games` and the disks under `/mnt`, `/media` and `/run/media`.
+- **Specs.** The graphics card comes from `/sys/class/drm` and `lspci` (video memory from the amdgpu driver or `nvidia-smi`), the memory and processor from `/proc`.
+- **Not on Linux.** The D3D12 Agility SDK check (only Windows programs load it), borderless fullscreen and the window's glass.
 
 ## Data folders
 
 | Path | Holds |
 | --- | --- |
-| `%LOCALAPPDATA%\Neves Launcher` | Repos, builds, shader caches, saves and profiles (`data`), previous builds, patches, logs. The install folder can be changed in Settings. |
-| `%APPDATA%\Neves Launcher\settings.json` | Settings |
+| `%LOCALAPPDATA%\Neves Launcher` (Linux: `~/.local/share/Neves Launcher`) | Repos, builds, shader caches, saves and profiles (`data`), previous builds, patches, logs. The install folder can be changed in Settings. |
+| `%APPDATA%\Neves Launcher\settings.json` (Linux: `~/.local/share/Neves Launcher/settings.json`) | Settings |
 
 Saves live in `data` and are never touched by an update, a rollback or a cache clear.
 
@@ -103,6 +114,8 @@ Output:
 
 - `src-tauri\target\release\Neves Launcher.exe`
 - `src-tauri\target\release\bundle\nsis\Neves Launcher_<version>_x64-setup.exe`
+
+On Linux, install WebKitGTK's development files first (Fedora: `sudo dnf install webkit2gtk4.1-devel libsoup3-devel openssl-devel librsvg2-devel`; Ubuntu and Debian: `sudo apt install libwebkit2gtk-4.1-dev librsvg2-dev libssl-dev patchelf`). `pnpm tauri build` then makes `src-tauri/target/release/bundle/appimage/*.AppImage`, `deb/*.deb` and `rpm/*.rpm`.
 
 ### Check the build like CI
 

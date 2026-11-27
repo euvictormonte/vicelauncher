@@ -134,6 +134,10 @@ fn check_release() -> Result<State, String> {
     let current = version(env!("CARGO_PKG_VERSION")).ok_or("The installed version is invalid.")?;
     // A fork must not offer an upstream release that does not ship its own executable.
     let has_launcher = release.assets.iter().any(|asset| asset.name == ASSET);
+    // On Linux only an AppImage replaces itself; a deb or rpm install updates with the system.
+    if installed_program().is_none() {
+        return Ok(State::Current);
+    }
     if available > current && has_launcher {
         Ok(State::Available(release))
     } else {
@@ -187,10 +191,26 @@ fn download_release(release: &Release) -> Result<DownloadedUpdate, String> {
     })
 }
 
+/// The file an update replaces: the running exe on Windows; on Linux the AppImage the
+/// launcher runs from (`$APPIMAGE`), or none for a deb or rpm install.
+fn installed_program() -> Option<PathBuf> {
+    if cfg!(windows) {
+        return std::env::current_exe().ok();
+    }
+    std::env::var_os("APPIMAGE")
+        .map(PathBuf::from)
+        .filter(|path| path.is_file())
+}
+
 pub fn restart_with(update: &DownloadedUpdate) -> Result<(), String> {
-    let executable = std::env::current_exe().map_err(|error| error.to_string())?;
+    let executable =
+        installed_program().ok_or("This install updates with the system's package manager.")?;
     let staged = executable.with_extension(format!("neves-launcher-{}.tmp", std::process::id()));
-    let backup = executable.with_extension("neves-launcher-previous.exe");
+    let backup = executable.with_extension(if cfg!(windows) {
+        "neves-launcher-previous.exe"
+    } else {
+        "neves-launcher-previous"
+    });
     let source = fs::File::open(&update.path)
         .map_err(|error| format!("Could not open the downloaded update: {error}"))?;
     let mut bytes = Vec::new();
@@ -210,6 +230,11 @@ pub fn restart_with(update: &DownloadedUpdate) -> Result<(), String> {
         .open(&staged)
         .map_err(|error| format!("Could not stage the update beside Neves Launcher: {error}"))?;
     let write_result = file.write_all(&bytes).and_then(|_| file.sync_all());
+    #[cfg(unix)]
+    let write_result = write_result.and_then(|_| {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&staged, fs::Permissions::from_mode(0o755))
+    });
     drop(file);
     let result = (|| -> Result<(), String> {
         write_result.map_err(|error| format!("Could not save the staged update: {error}"))?;

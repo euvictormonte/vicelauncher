@@ -18,6 +18,7 @@ The tree often has other people's uncommitted edits. Do not revert or reformat f
 
 - `src/` React UI. `src/dev/mock.ts` is the browser mock backend; keep it in step with `src/lib/types.ts`.
 - `src-tauri/src/` Rust launcher. The project list comes from `brand::PROJECT_SOURCES`; the list's options and the PC-spec override are saved settings (`launcher.rs`, actions in `launcher/actions.rs`).
+- `src-tauri/src/platform.rs` holds what differs between Windows and Linux (program names, disks, processes, Wine for `.exe` on Linux); `tools.rs` installs build tools with winget or the Linux package manager.
 - `src/lib/compat.ts` judges a build against the PC (yes / close / no); `withSpec` applies the player's own RAM and video memory.
 
 ## For AI agents
@@ -25,7 +26,7 @@ The tree often has other people's uncommitted edits. Do not revert or reformat f
 `node scripts/neves-launcher-agent.mjs <command> [--json]` (or `pnpm agent`) is the only tool to use on the launcher's projects. Run `help` for the list.
 
 - Read-only, always allowed: `status` (folders, agent access, tools, disk, projects, builds), `projects`, `log <repo>`, `patch-status <repo>`, `patch-export <repo> --out <file>` (writes only the new file, never overwrites).
-- Changing: `fix <repo> --yes` (runs the launcher's Fix and verify) and `patch-apply <repo> <file> --yes` (git apply to the working tree, never commits). Both need the player's **AI agent access** setting on (`agent_access: true` in `%APPDATA%\Neves Launcher\settings.json`; missing means off). Without it they exit 1 and change nothing.
+- Changing: `fix <repo> --yes` (runs the launcher's Fix and verify) and `patch-apply <repo> <file> --yes` (git apply to the working tree, never commits). Both need the player's **AI agent access** setting on (`agent_access: true` in `%APPDATA%\Neves Launcher\settings.json`, on Linux `~/.local/share/Neves Launcher/settings.json`; missing means off). Without it they exit 1 and change nothing.
 - Flow: `status` -> `log <repo>` -> make the change on a branch in `repos\<slug>` -> `patch-export <repo> --out <file>` -> `patch-apply <repo> <file> --yes` -> `fix <repo> --yes` -> `status` again.
 - Exit codes: 0 ok, 1 refused, 2 usage error, 3 failure. Errors go to stderr.
 - Changes run on the player's PC and are their responsibility. Show the patch to the player before `fix`.

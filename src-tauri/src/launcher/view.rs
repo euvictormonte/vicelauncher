@@ -17,6 +17,8 @@ pub(crate) struct Snapshot {
     selected: Option<String>,
     settings: SettingsView,
     files: FilesView,
+    /// The launcher's system: "windows", "linux" or "macos".
+    os: &'static str,
     tools: Option<ToolsView>,
     job: JobView,
     updater: UpdaterView,
@@ -146,6 +148,8 @@ struct FilesView {
 struct ToolsView {
     ready: bool,
     missing: Vec<&'static str>,
+    /// What installs the missing ones: "winget", "dnf", "apt", "pacman", "zypper", or none.
+    installer: Option<&'static str>,
 }
 
 #[derive(Serialize)]
@@ -177,15 +181,9 @@ pub(crate) struct LogView {
     pub(crate) omitted: usize,
 }
 
-/// A time as the player's clock shows it (Windows only; elsewhere none).
+/// A time as the player's clock shows it.
 fn local_time(seconds: u64) -> Option<String> {
-    #[cfg(windows)]
-    return build_activity::local_time(seconds);
-    #[cfg(not(windows))]
-    {
-        let _ = seconds;
-        None
-    }
+    crate::platform::local_time(seconds)
 }
 
 impl App {
@@ -265,9 +263,11 @@ impl App {
                 searching,
                 find_error: self.find_error.clone(),
             },
+            os: crate::platform::os(),
             tools: tools::current().map(|t| ToolsView {
                 ready: t.ready(),
                 missing: t.missing(),
+                installer: t.installer,
             }),
             job,
             updater: self.updater_view(),

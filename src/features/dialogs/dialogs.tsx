@@ -14,6 +14,7 @@ import type { PlayChoice, PlayNext, SaveOption, SavesList } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { NoticeDialog } from "./notice-dialog"
 import { t } from "@/lib/i18n"
+import { toolsInstallHint } from "@/lib/platform"
 
 /** Every dialog, opened from the store or by the launcher itself (a failed import, a move). */
 export function Dialogs() {
@@ -258,7 +259,7 @@ function SetupDialog({ repo, onClose }: { repo: string; onClose(): void }) {
             n={1}
             done={toolsOk}
             title="Build tools"
-            detail={!tools ? "Checking for Git, Rust and the C++ build tools…" : tools.ready ? "Git, Rust and the C++ build tools are ready." : toolsBusy ? snap.job.stage : `Missing ${tools.missing.join(", ")}. Installed with winget; Windows asks for permission.`}
+            detail={!tools ? "Checking for Git, Rust and the C++ build tools…" : tools.ready ? "Git, Rust and the C++ build tools are ready." : toolsBusy ? snap.job.stage : `${t("Missing {tools}", { tools: tools.missing.join(", ") })}. ${t(toolsInstallHint(snap))}`}
           >
             {tools && !tools.ready && (
               <Button size="sm" disabled={snap.job.running} onClick={() => void run({ type: "install_tools" })}>

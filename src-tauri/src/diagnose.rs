@@ -663,7 +663,10 @@ pub(crate) fn preflight(check: &Check) -> Vec<Finding> {
             heavy: true,
             data: None,
         });
-    } else if !agility_ok(check.exe.parent().unwrap_or(Path::new(".")), &agility) {
+    } else if crate::platform::is_windows_program(check.exe)
+        && !agility_ok(check.exe.parent().unwrap_or(Path::new(".")), &agility)
+    {
+        // Only a Windows program loads the Agility files; a Linux build of victory does not.
         found.push(Finding {
             title: "The D3D12 Agility SDK files are missing or not the expected version.".to_string(),
             detail: "The game needs them in D3D12\\ next to its exe, or device creation fails with 0x887E0003. Fix and verify finds the project's version, installs it and checks every hash.".to_string(),
@@ -710,7 +713,7 @@ pub(crate) fn preflight(check: &Check) -> Vec<Finding> {
         if !crate::tools::detect().ready() {
             found.push(Finding {
                 title: "Building is missing one or more tools.".to_string(),
-                detail: "Fix and verify installs the missing Git, Rust or C++ build tools with winget and looks again.".to_string(),
+                detail: "Fix and verify installs the missing Git, Rust or C++ build tools (with winget on Windows, with the system's package manager and rustup on Linux) and looks again.".to_string(),
                 fix: Some(FIX_TOOLS),
                 heavy: true,
                 data: None,

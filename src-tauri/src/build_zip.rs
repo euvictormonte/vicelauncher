@@ -97,7 +97,7 @@ fn extract_contents(zip: &mut zip::ZipArchive<File>, destination: &Path) -> io::
 pub fn is_victory(executable: &Path) -> bool {
     executable
         .file_name()
-        .is_some_and(|name| name.eq_ignore_ascii_case("victory.exe"))
+        .is_some_and(|name| name.eq_ignore_ascii_case("victory.exe") || name == "victory")
 }
 
 /// Read only literal defaults from a companion script. The script itself is never run.

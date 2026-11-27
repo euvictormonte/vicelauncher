@@ -30,6 +30,8 @@ pub(crate) fn write(workspace: &Path, slug: &str, stage: &str, lines: &[String])
     let private = [
         std::env::var("USERNAME").unwrap_or_default(),
         std::env::var("USERPROFILE").unwrap_or_default(),
+        std::env::var("USER").unwrap_or_default(),
+        std::env::var("HOME").unwrap_or_default(),
         workspace.display().to_string(),
     ];
 

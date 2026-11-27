@@ -8,12 +8,12 @@
 
 use crate::notify::Ctx;
 use crate::{
-    brand, build_activity, build_zip, diagnose, fullscreen, job_log, patches, previous,
+    brand, build_activity, build_zip, diagnose, fullscreen, job_log, patches, platform, previous,
     rust_project, saves, script_preset, tools, updater,
 };
 use serde::{Deserialize, Serialize};
 use std::io::{BufRead, BufReader};
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
@@ -559,10 +559,19 @@ fn built_exe(repo: &str) -> PathBuf {
     let dir = repo_dir(repo);
     let workspace = cargo_workspace(&dir).unwrap_or_else(|_| dir.clone());
     let target = target_dir(repo);
-    let executable = target
-        .join(detect_build_profile(&workspace))
-        .join("victory.exe");
-    let previous = target.join("release").join("victory.exe");
+    let profile = detect_build_profile(&workspace);
+    let executable = target.join(profile).join(platform::victory_exe());
+    // On Linux a Windows-only project is built for Windows (see build_project).
+    if !cfg!(windows) && !executable.is_file() {
+        let windows = target
+            .join(platform::WINDOWS_TARGET)
+            .join(profile)
+            .join("victory.exe");
+        if windows.is_file() {
+            return windows;
+        }
+    }
+    let previous = target.join("release").join(platform::victory_exe());
     if workspace != dir && !executable.is_file() && previous.is_file() {
         return previous;
     }
@@ -633,9 +642,16 @@ fn detect_build_profile(repo_dir: &Path) -> &'static str {
     "release"
 }
 
-/// Reads VICTORY_* environment variables from a project's scripts/play.ps1.
+/// Reads VICTORY_* environment variables from a project's scripts/play.ps1, or on
+/// Linux from its scripts/play.sh when it has one (`export VICTORY_FOO=1` lines).
 fn detect_launch_env(repo_dir: &Path) -> Vec<(String, String)> {
-    let script = repo_dir.join("scripts").join("play.ps1");
+    let scripts = repo_dir.join("scripts");
+    if !cfg!(windows) {
+        if let Ok(text) = std::fs::read_to_string(scripts.join("play.sh")) {
+            return shell_launch_env(&text);
+        }
+    }
+    let script = scripts.join("play.ps1");
     let Ok(text) = std::fs::read_to_string(&script) else {
         return Vec::new();
     };
@@ -658,6 +674,37 @@ fn detect_launch_env(repo_dir: &Path) -> Vec<(String, String)> {
     }
     vars
 }
+/// `VICTORY_*` assignments in a shell script (`export VICTORY_FOO=1`, `VICTORY_BAR="x"`).
+/// Only literal values are taken; the script itself is never run.
+fn shell_launch_env(text: &str) -> Vec<(String, String)> {
+    text.lines()
+        .filter_map(|line| {
+            let line = line.trim();
+            let line = line.strip_prefix("export ").unwrap_or(line).trim();
+            let (k, v) = line.split_once('=')?;
+            let v = v.split(" #").next().unwrap_or(v).trim();
+            let literal = !v.contains('$') && !v.contains('`');
+            (k.starts_with("VICTORY_")
+                && k.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')
+                && literal)
+                .then(|| (k.to_string(), v.trim_matches('\'').trim_matches('"').to_string()))
+        })
+        .collect()
+}
+
+#[cfg(test)]
+#[test]
+fn shell_scripts_give_their_literal_victory_values() {
+    let text = "#!/bin/sh\nexport VICTORY_RELAY=2\nVICTORY_MODE=\"fast\" # comment\nexport VICTORY_DIR=$HOME/x\nOTHER=1\n";
+    assert_eq!(
+        shell_launch_env(text),
+        vec![
+            ("VICTORY_RELAY".to_string(), "2".to_string()),
+            ("VICTORY_MODE".to_string(), "fast".to_string())
+        ]
+    );
+}
+
 /// The commit an installed build was made from, written after a build.
 fn built_file(repo: &str) -> PathBuf {
     target_dir(repo).join("built-from.txt")
@@ -766,41 +813,22 @@ fn find_game_in(dir: &Path, depth: u32) -> Option<PathBuf> {
     None
 }
 
-/// The part of a saved folder after its drive: `Games\Scarlett` for `E:\Games\Scarlett`.
-fn folder_tail(saved: &Path) -> Option<PathBuf> {
-    let tail: PathBuf = saved
-        .components()
-        .skip_while(|c| matches!(c, Component::Prefix(_) | Component::RootDir))
-        .collect();
-    (!tail.as_os_str().is_empty()).then_some(tail)
-}
-
-/// The same folder on another connected drive that holds the game, for when the
-/// drive letter changed (an external SSD that came back as F: instead of E:).
+/// The same folder on another connected disk that holds the game, for when the
+/// drive letter or mount name changed (an external SSD that came back as F: instead of E:).
 fn find_moved_game(saved: &Path) -> Option<PathBuf> {
-    let tail = folder_tail(saved)?;
-    ('A'..='Z')
-        .map(|letter| PathBuf::from(format!("{letter}:\\")))
-        .filter(|root| root.is_dir())
-        .map(|root| root.join(&tail))
+    platform::same_folder_on_other_disks(saved)
+        .into_iter()
         .find(|candidate| candidate.join(EXE_NAME).is_file())
 }
 
-/// Whether the drive a folder is on is connected. A folder without a drive letter counts as connected.
+/// Whether the disk a folder is on is connected. A folder on no removable disk counts as connected.
 fn drive_connected(dir: &Path) -> bool {
-    match dir.components().next() {
-        Some(Component::Prefix(_)) => dir.components().take(2).collect::<PathBuf>().exists(),
-        _ => true,
-    }
+    platform::disk_connected(dir)
 }
 
-/// Every drive's folders, three levels down, for the game's exe.
+/// Every disk's folders, three levels down, for the game's exe.
 fn search_drives() -> Result<String, String> {
-    for letter in b'C'..=b'Z' {
-        let root = PathBuf::from(format!("{}:\\", letter as char));
-        if !root.is_dir() {
-            continue;
-        }
+    for root in platform::search_roots() {
         if let Some(found) = find_game_in(&root, 3) {
             return Ok(found.display().to_string());
         }
@@ -1718,17 +1746,56 @@ fn build_project(
         "release"
     };
     let has_lockfile = workspace.join("Cargo.lock").is_file();
-    let mut cargo = tools::cargo();
-    cargo.args(["build", "--profile", profile, "--target-dir"]);
-    cargo.arg(target);
-    if has_lockfile {
-        cargo.arg("--locked");
+    // On Linux a project made for Windows only is built for Windows with cargo-xwin and
+    // played through Wine or Proton; others are built for Linux.
+    let mut for_windows = platform::wants_windows_target(&workspace);
+    let cargo_for = |for_windows: bool| {
+        let mut cargo = tools::cargo();
+        if for_windows {
+            cargo.args(["xwin", "build", "--target", platform::WINDOWS_TARGET]);
+        } else {
+            cargo.arg("build");
+        }
+        cargo.args(["--profile", profile, "--target-dir"]);
+        cargo.arg(target);
+        if has_lockfile {
+            cargo.arg("--locked");
+        }
+        cargo.current_dir(&workspace);
+        cargo
+    };
+    if for_windows {
+        job.lock().unwrap().log.push(format!(
+            "This project is made for Windows: building it for {} with cargo-xwin, to play through Wine or Proton.",
+            platform::WINDOWS_TARGET
+        ));
     }
-    cargo.current_dir(&workspace);
+    let mut cargo = cargo_for(for_windows);
     if victory {
         cargo.args(["-p", "victory"]);
-        run(job, ctx, &mut cargo)?;
-        let executable = target.join(profile).join("victory.exe");
+        let native = run(job, ctx, &mut cargo);
+        if let Err(error) = native {
+            // A Linux build that fails may be a Windows-only project: try it for Windows.
+            if for_windows || cfg!(windows) || !tools::current().is_some_and(|t| t.cross) {
+                return Err(error);
+            }
+            job.lock().unwrap().log.push(format!(
+                "The Linux build failed ({error}). Trying a build for Windows ({}) with cargo-xwin, to play through Wine or Proton.",
+                platform::WINDOWS_TARGET
+            ));
+            for_windows = true;
+            let mut cargo = cargo_for(true);
+            cargo.args(["-p", "victory"]);
+            run(job, ctx, &mut cargo)?;
+        }
+        let executable = if for_windows {
+            target
+                .join(platform::WINDOWS_TARGET)
+                .join(profile)
+                .join("victory.exe")
+        } else {
+            target.join(profile).join(platform::victory_exe())
+        };
         if !executable.is_file() {
             return Err(format!("the build made no {}", executable.display()));
         }
@@ -1990,21 +2057,9 @@ fn clear_read_only(dir: &Path) {
     }
 }
 
-/// Ends every process whose program lives under `dir` (the game and the victory.exe that runs it).
+/// Ends every process whose program lives under `dir` (the game and the victory that runs it).
 fn stop_programs_under(dir: &Path) {
-    #[cfg(windows)]
-    {
-        let folder = dir.display().to_string().replace('\'', "''");
-        let script = format!(
-            "Get-Process | Where-Object {{ $_.Path -and $_.Path.StartsWith('{folder}', [StringComparison]::OrdinalIgnoreCase) }} | Stop-Process -Force -ErrorAction SilentlyContinue"
-        );
-        let mut c = Command::new("powershell");
-        c.args(["-NoProfile", "-NonInteractive", "-Command", &script]);
-        hide_window(&mut c);
-        let _ = c.status();
-    }
-    #[cfg(not(windows))]
-    let _ = dir;
+    platform::stop_programs_under(dir)
 }
 
 /// The victory.exe `p` runs with: its build, or a build already on this PC.
@@ -2063,8 +2118,13 @@ fn victory_env(c: &mut Command, p: &Project, l: &Launch) {
     }
 }
 
+/// A command that starts `exe`: itself, or a Windows program through Wine on Linux.
+fn program(exe: &Path) -> Result<Command, String> {
+    platform::program_command(exe, &workspace())
+}
+
 fn victory_help(exe: &Path, subcommand: &str) -> Option<String> {
-    let mut command = Command::new(exe);
+    let mut command = program(exe).ok()?;
     command.args([subcommand, "--help"]);
     hide_window(&mut command);
     let output = command.output().ok()?;
@@ -2119,10 +2179,10 @@ fn pipeline_warm_up_creates_the_configured_cache_on_first_use() {
 #[test]
 fn a_moved_game_folder_keeps_its_path_under_the_drive() {
     assert_eq!(
-        folder_tail(Path::new(r"E:\Games\Scarlett")),
-        Some(PathBuf::from(r"Games\Scarlett"))
+        platform::split_disk(Path::new(r"E:\Games\Scarlett")),
+        Some((PathBuf::from(r"E:\"), PathBuf::from(r"Games\Scarlett")))
     );
-    assert_eq!(folder_tail(Path::new(r"E:\")), None);
+    assert_eq!(platform::split_disk(Path::new(r"E:\")), None);
     assert!(drive_connected(Path::new(r"C:\")));
     assert!(drive_connected(Path::new("relative")));
     assert_eq!(
@@ -2148,7 +2208,7 @@ fn warm(job: &Arc<Mutex<Job>>, ctx: &Ctx, p: &Project, l: &Launch) -> Result<(),
         .as_deref()
         .filter(|help| supports_flag(help, "--cache"));
     let mut commands = Vec::new();
-    let mut shaders = Command::new(&exe);
+    let mut shaders = program(&exe)?;
     if let Some(help) = translate_cache {
         shaders.args(["translate", "--cache"]);
         if l.pipelines && supports_flag(help, "--pipelines") {
@@ -2165,7 +2225,7 @@ fn warm(job: &Arc<Mutex<Job>>, ctx: &Ctx, p: &Project, l: &Launch) -> Result<(),
     commands.push(shaders);
     if l.pipelines && !translate_cache.is_some_and(|help| supports_flag(help, "--pipelines")) {
         if victory_help(&exe, "warm").is_some_and(|help| supports_flag(&help, "--used")) {
-            let mut pipelines = Command::new(&exe);
+            let mut pipelines = program(&exe)?;
             pipelines.args(["warm", "--used"]);
             commands.push(pipelines);
         } else {
@@ -2186,7 +2246,8 @@ fn warm(job: &Arc<Mutex<Job>>, ctx: &Ctx, p: &Project, l: &Launch) -> Result<(),
     );
     for mut command in commands {
         victory_env(&mut command, p, l);
-        if command.get_args().next().is_some_and(|arg| arg == "warm") {
+        // Under Wine the program itself is the first argument.
+        if command.get_args().take(2).any(|arg| arg == "warm") {
             prepare_pipeline_cache(&command)?;
         }
         job.lock().unwrap().stoppable = true;
@@ -2225,11 +2286,8 @@ fn fix_game_files(l: &mut Launch, log: &dyn Fn(String)) -> Result<String, String
         candidates.extend(find_game_in(&chosen, 3));
     }
     candidates.extend(find_moved_game(&chosen));
-    for letter in b'C'..=b'Z' {
-        let root = PathBuf::from(format!("{}:\\", letter as char));
-        if root.is_dir() {
-            candidates.extend(find_game_in(&root, 3));
-        }
+    for root in platform::search_roots() {
+        candidates.extend(find_game_in(&root, 3));
     }
     for candidate in candidates {
         if game_files_ok(&candidate) {
@@ -2253,17 +2311,12 @@ fn install_missing_tools(job: &Arc<Mutex<Job>>, ctx: &Ctx) -> Result<(), String>
     if have.ready() {
         return Ok(());
     }
-    if !tools::has_winget() {
-        return Err("winget (the Windows package manager) is not on this PC. Install them by hand: git-scm.com, rustup.rs and the Visual Studio Build Tools (Desktop development with C++).".into());
-    }
-    for (what, args) in tools::install_steps(&have) {
+    for (what, mut c) in tools::install_commands(&have)? {
         stage(
             job,
             ctx,
             &format!("Installing {what} (this can take a while)"),
         );
-        let mut c = Command::new("winget");
-        c.args(&args);
         run(job, ctx, &mut c).map_err(|error| format!("{what}: {error}"))?;
     }
     Ok(())
@@ -2294,7 +2347,7 @@ fn fix_build(
     stage(job, ctx, "Rebuilding the missing program");
     install(job, ctx, p, project_installed(&p.repo), l)?;
     let exe = project_exe(p)?;
-    let mut c = Command::new(&exe);
+    let mut c = program(&exe)?;
     c.arg("--version");
     hide_window(&mut c);
     let answers = c.output().is_ok_and(|out| out.status.success());
@@ -2345,32 +2398,8 @@ fn fix_permissions(p: &Project) -> Result<String, String> {
     ))
 }
 
-#[cfg(windows)]
 fn free_bytes(dir: &Path) -> Option<u64> {
-    let drive: String = dir
-        .components()
-        .take(2)
-        .collect::<PathBuf>()
-        .display()
-        .to_string();
-    let mut c = Command::new("fsutil");
-    c.args(["volume", "diskfree", &drive]);
-    hide_window(&mut c);
-    let output = c.output().ok()?;
-    let text = String::from_utf8_lossy(&output.stdout);
-    let after = text.lines().next()?.split(':').nth(1)?;
-    let digits: String = after
-        .split('(')
-        .next()?
-        .chars()
-        .filter(|c| c.is_ascii_digit())
-        .collect();
-    digits.parse().ok()
-}
-
-#[cfg(not(windows))]
-fn free_bytes(_dir: &Path) -> Option<u64> {
-    None
+    platform::free_bytes(dir)
 }
 
 fn fix_disk(p: &Project, job: &Arc<Mutex<Job>>) -> Result<String, String> {
@@ -2517,23 +2546,30 @@ fn fix_graphics(
 }
 
 fn open_driver_page(vendor: Option<&str>) -> Result<String, String> {
-    let url = match vendor {
-        Some("nvidia") => "https://www.nvidia.com/Download/index.aspx",
-        Some("amd") => "https://www.amd.com/en/support",
-        Some("intel") => "https://www.intel.com/content/www/us/en/download-center/home.html",
-        _ => "https://www.microsoft.com/en-us/windows/windows-update",
+    let url = if cfg!(windows) {
+        match vendor {
+            Some("nvidia") => "https://www.nvidia.com/Download/index.aspx",
+            Some("amd") => "https://www.amd.com/en/support",
+            Some("intel") => "https://www.intel.com/content/www/us/en/download-center/home.html",
+            _ => "https://www.microsoft.com/en-us/windows/windows-update",
+        }
+    } else {
+        // On Linux AMD and Intel drivers (Mesa) come with the system's updates; NVIDIA's do not.
+        match vendor {
+            Some("nvidia") => "https://www.nvidia.com/en-us/drivers/unix/",
+            _ => "https://docs.mesa3d.org/download.html",
+        }
     };
     open_url(url)?;
-    Ok(format!("Opened {url}; install what the maker offers."))
+    Ok(if cfg!(windows) || vendor == Some("nvidia") {
+        format!("Opened {url}; install what the maker offers.")
+    } else {
+        format!("Opened {url}. Mesa updates with the system: install your distribution's updates.")
+    })
 }
 
 fn open_url(url: &str) -> Result<(), String> {
-    let mut c = Command::new("cmd");
-    c.args(["/C", "start", "", url]);
-    hide_window(&mut c);
-    c.status()
-        .map(|_| ())
-        .map_err(|error| format!("Could not open {url}: {error}"))
+    platform::open_url(url)
 }
 
 /// Runs one finding's fix with every check logged. `Ok(None)` is a finding with no automatic fix.
@@ -2706,7 +2742,7 @@ fn play(
                 cargo_workspace(&repo_dir(&p.repo))?,
             )
         };
-        let mut command = Command::new(exe);
+        let mut command = program(&exe)?;
         command.current_dir(dir).args(&l.program_args);
         stage(job, ctx, "Checking known problems");
         run_fixes(job, ctx, p, l, false)?;
@@ -2753,7 +2789,7 @@ fn play(
         }
     }
     stage(job, ctx, "Playing");
-    let mut c = Command::new(&exe);
+    let mut c = program(&exe)?;
     c.arg("run").arg(l.game_dir.join(EXE_NAME)).arg("--execute");
     let explicit_console = l
         .args
@@ -2861,6 +2897,7 @@ fn run_with_output(
 ) -> Result<(), String> {
     c.stdout(Stdio::piped()).stderr(Stdio::piped());
     hide_window(c);
+    platform::own_process_group(c);
     let mut child = c
         .spawn()
         .map_err(|e| format!("could not start {:?}: {e}", c.get_program()))?;

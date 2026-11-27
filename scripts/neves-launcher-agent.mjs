@@ -18,7 +18,8 @@
 //   help                                this list and the safety rules
 //
 // Agent access is the setting "AI agent access" in the launcher. It is stored as
-// "agent_access": true in %APPDATA%\Neves Launcher\settings.json. Missing or false means off.
+// "agent_access": true in %APPDATA%\Neves Launcher\settings.json (on Linux
+// ~/.local/share/Neves Launcher/settings.json). Missing or false means off.
 // The launcher's own state is read from there; this tool never writes it.
 //
 // Typical flow: status -> log -> change the code on a branch in repos\<slug> ->
@@ -44,14 +45,18 @@
 
 import { execFile, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFile, readdir, stat, statfs, writeFile } from "node:fs/promises";
+import { readFile, readdir, readlink, stat, statfs, writeFile } from "node:fs/promises";
 import { homedir, userInfo } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const EXIT = { ok: 0, refused: 1, usage: 2, failure: 3 };
 const FOLDER = "Neves Launcher";
-const EXE_NAME = "Neves Launcher.exe";
+const WINDOWS = process.platform === "win32";
+const EXE_NAME = WINDOWS ? "Neves Launcher.exe" : "Neves Launcher";
+// The program's names: the bundle's, and Cargo's for a build made without the Tauri CLI.
+const EXE_NAMES = WINDOWS ? [EXE_NAME, "neves_launcher.exe"] : [EXE_NAME, "neves-launcher", "neves_launcher"];
+const VICTORY_EXE = WINDOWS ? "victory.exe" : "victory";
 const MAX_PATCH_BYTES = 2 * 1024 * 1024;
 const COMMIT = /^[0-9a-f]{7,40}$/;
 const OWNER_NAME = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
@@ -102,9 +107,14 @@ function redact(text, extra = []) {
 
 // ---------- launcher folders and settings ----------
 
+// Windows: %APPDATA% (settings) and %LOCALAPPDATA% (projects). Elsewhere both are
+// $XDG_DATA_HOME (~/.local/share), as brand.rs does.
 function launcherFolders() {
-  const roaming = process.env.APPDATA ? join(process.env.APPDATA, FOLDER) : null;
-  const local = process.env.LOCALAPPDATA ? join(process.env.LOCALAPPDATA, FOLDER) : null;
+  const xdg = process.env.XDG_DATA_HOME || (process.env.HOME ? join(process.env.HOME, ".local", "share") : null);
+  const roamingBase = process.env.APPDATA || (WINDOWS ? null : xdg);
+  const localBase = process.env.LOCALAPPDATA || (WINDOWS ? null : xdg);
+  const roaming = roamingBase ? join(roamingBase, FOLDER) : null;
+  const local = localBase ? join(localBase, FOLDER) : null;
   return { roaming, local, settings: roaming ? join(roaming, "settings.json") : null };
 }
 
@@ -273,7 +283,7 @@ async function isInstalled(repoDir, targetDir) {
     }
   }
   const profile = await readCargoProfile(repoDir);
-  return isFile(join(targetDir, profile, "victory.exe"));
+  return isFile(join(targetDir, profile, VICTORY_EXE));
 }
 
 async function projectStatus(wsPath, entry) {
@@ -381,8 +391,8 @@ async function cmdStatus() {
   };
   const lines = [
     "Neves Launcher agent status",
-    `Settings:       %APPDATA%\\${FOLDER}\\settings.json  ${data.settings_file}`,
-    `Install folder: ${ws ? (ws.kind === "custom" ? "custom folder set in Settings" : `%LOCALAPPDATA%\\${FOLDER}`) : "unknown"}  ${wsExists ? "found" : "missing"}`,
+    `Settings:       ${WINDOWS ? `%APPDATA%\\${FOLDER}\\settings.json` : `~/.local/share/${FOLDER}/settings.json`}  ${data.settings_file}`,
+    `Install folder: ${ws ? (ws.kind === "custom" ? "custom folder set in Settings" : WINDOWS ? `%LOCALAPPDATA%\\${FOLDER}` : `~/.local/share/${FOLDER}`) : "unknown"}  ${wsExists ? "found" : "missing"}`,
     `Agent access:  ${accessOn ? "on" : "off (fix and patch-apply are refused)"}`,
     `Tools:          git ${data.tools.git ? "found" : "not found"}, cargo ${data.tools.cargo ? "found" : "not found"}`,
     `Free space:     ${data.free_disk_gib === null ? "unknown" : `${data.free_disk_gib} GiB on the launcher's drive`}`,
@@ -633,11 +643,15 @@ async function cmdFix(args, flags, emit) {
   const settings = await loadSettings(folders);
   console.error(WARNING);
   requireChange(settings, flags, "fix");
-  const releaseExe = join(ROOT, "src-tauri", "target", "release", EXE_NAME);
-  const debugExe = join(ROOT, "src-tauri", "target", "debug", EXE_NAME);
-  const exe = (await isFile(releaseExe)) ? releaseExe : (await isFile(debugExe)) ? debugExe : null;
+  let exe = null;
+  for (const profile of ["release", "debug"]) {
+    for (const name of EXE_NAMES) {
+      const candidate = join(ROOT, "src-tauri", "target", profile, name);
+      if (!exe && (await isFile(candidate))) exe = candidate;
+    }
+  }
   if (!exe) {
-    throw failure("the launcher is not built. Run pnpm tauri build first (src-tauri\\target\\release\\Neves Launcher.exe)");
+    throw failure(`the launcher is not built. Run pnpm tauri build first (src-tauri/target/release/${EXE_NAME})`);
   }
   const running = await launcherRunning();
   if (running) throw refused("Neves Launcher is running. Close it first: it may hold the files Fix needs.");
@@ -699,13 +713,35 @@ function lineSplitter(onLine) {
   };
 }
 
-function launcherRunning() {
+async function launcherRunning() {
+  if (!WINDOWS) return linuxLauncherRunning();
   return new Promise((done, reject) => {
     execFile("tasklist", ["/FI", `IMAGENAME eq ${EXE_NAME}`, "/FO", "CSV", "/NH"], { windowsHide: true }, (error, stdout) => {
       if (error) reject(failure("could not check whether Neves Launcher is running (tasklist failed), so Fix was not started"));
       else done(/"Neves Launcher\.exe"/i.test(String(stdout)));
     });
   });
+}
+
+// Linux: any process whose program file is named like the launcher.
+async function linuxLauncherRunning() {
+  let pids;
+  try {
+    pids = (await readdir("/proc")).filter((name) => /^\d+$/.test(name));
+  } catch {
+    throw failure("could not check whether Neves Launcher is running (/proc is unreadable), so Fix was not started");
+  }
+  for (const pid of pids) {
+    if (Number(pid) === process.pid) continue;
+    try {
+      const target = await readlink(join("/proc", pid, "exe"));
+      const name = target.split("/").pop().replace(/ \(deleted\)$/, "");
+      if (EXE_NAMES.includes(name)) return true;
+    } catch {
+      // another user's process, or one that just ended
+    }
+  }
+  return false;
 }
 
 // Redacts every string value in a result, so escaped paths in JSON are caught too.

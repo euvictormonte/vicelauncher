@@ -3,8 +3,8 @@
 //! the system memory, so the window can say whether a build is likely to run
 //! here and which builds to recommend.
 //!
-//! On Windows one hidden PowerShell call answers everything; elsewhere
-//! (development only) the memory is read and the graphics list stays short.
+//! On Windows one hidden PowerShell call answers everything; on Linux /proc,
+//! /sys/class/drm, lspci and nvidia-smi do.
 
 use serde::Serialize;
 
@@ -181,10 +181,153 @@ fn detect_inner() -> SystemInfo {
         .ok()
         .and_then(|text| meminfo_bytes(&text))
         .and_then(ram_gb);
+    let cpuinfo = std::fs::read_to_string("/proc/cpuinfo").unwrap_or_default();
+    let (cpu, cpu_cores) = cpuinfo_summary(&cpuinfo);
     SystemInfo {
-        gpus: Vec::new(),
+        gpus: linux::gpus(),
         ram_gb,
-        ..SystemInfo::default()
+        cpu,
+        cpu_cores,
+    }
+}
+
+/// The processor's name and its logical processors, from /proc/cpuinfo.
+#[cfg_attr(any(windows, target_os = "macos"), allow(dead_code))]
+fn cpuinfo_summary(text: &str) -> (Option<String>, Option<u32>) {
+    let cpu = text
+        .lines()
+        .find(|l| l.starts_with("model name"))
+        .and_then(|l| l.split_once(':'))
+        .map(|(_, name)| name.split_whitespace().collect::<Vec<_>>().join(" "))
+        .filter(|name| !name.is_empty());
+    let cores = text
+        .lines()
+        .filter(|l| l.split(':').next().is_some_and(|k| k.trim() == "processor"))
+        .count() as u32;
+    (cpu, (cores >= 1).then_some(cores))
+}
+
+/// The graphics cards on Linux: each DRM card's PCI device (/sys/class/drm/cardN/device),
+/// named by lspci (or nvidia-smi), with the video memory the amdgpu driver reports
+/// (or nvidia-smi's). Integrated Intel graphics share the system memory and show none.
+#[cfg(all(not(windows), not(target_os = "macos")))]
+mod linux {
+    use super::{cards, Gpu};
+    use std::path::Path;
+    use std::process::Command;
+
+    pub(super) fn gpus() -> Vec<Gpu> {
+        let nvidia = nvidia_smi();
+        let mut names = Vec::new();
+        let mut adapters: Vec<(String, f64)> = Vec::new();
+        let mut seen = Vec::new();
+        for entry in std::fs::read_dir("/sys/class/drm").into_iter().flatten().flatten() {
+            let card = entry.file_name().to_string_lossy().into_owned();
+            // card0, card1...; not the connectors (card1-DP-1) or render nodes.
+            if !card.strip_prefix("card").is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit())) {
+                continue;
+            }
+            let device = entry.path().join("device");
+            let Ok(pci) = std::fs::canonicalize(&device) else { continue };
+            let slot = pci.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+            if seen.contains(&slot) {
+                continue;
+            }
+            seen.push(slot.clone());
+            let vendor_id = read(&device.join("vendor")).unwrap_or_default();
+            let name = match vendor_id.as_str() {
+                // nvidia-smi lists the cards in PCI order, as the names it gives.
+                "0x10de" => nvidia
+                    .iter()
+                    .find(|(bus, _, _)| bus_matches(bus, &slot))
+                    .map(|(_, name, _)| name.clone())
+                    .or_else(|| lspci_name(&slot, "NVIDIA")),
+                "0x1002" => lspci_name(&slot, "AMD"),
+                "0x8086" => lspci_name(&slot, "Intel"),
+                _ => lspci_name(&slot, ""),
+            };
+            let name = name.unwrap_or_else(|| match vendor_id.as_str() {
+                "0x10de" => "NVIDIA graphics".into(),
+                "0x1002" => "AMD Radeon graphics".into(),
+                "0x8086" => "Intel graphics".into(),
+                _ => "Graphics card".into(),
+            });
+            let vram = read(&device.join("mem_info_vram_total"))
+                .and_then(|v| v.parse::<f64>().ok())
+                .filter(|bytes| *bytes > 0.0)
+                .or_else(|| {
+                    nvidia
+                        .iter()
+                        .find(|(bus, _, _)| bus_matches(bus, &slot))
+                        .map(|(_, _, bytes)| *bytes)
+                });
+            if let Some(bytes) = vram {
+                adapters.push((name.clone(), bytes));
+            }
+            names.push(name);
+        }
+        cards(&names, &adapters)
+    }
+
+    fn read(path: &Path) -> Option<String> {
+        std::fs::read_to_string(path)
+            .ok()
+            .map(|s| s.trim().to_owned())
+            .filter(|s| !s.is_empty())
+    }
+
+    /// nvidia-smi's bus id (`00000000:01:00.0`) against a sysfs slot (`0000:01:00.0`).
+    fn bus_matches(bus: &str, slot: &str) -> bool {
+        let tail = |s: &str| s.rsplitn(3, ':').take(2).collect::<Vec<_>>().join(":").to_lowercase();
+        tail(bus) == tail(slot)
+    }
+
+    /// (bus id, name, video memory in bytes) of every NVIDIA card, if its driver is installed.
+    fn nvidia_smi() -> Vec<(String, String, f64)> {
+        let Ok(output) = Command::new("nvidia-smi")
+            .args(["--query-gpu=pci.bus_id,name,memory.total", "--format=csv,noheader,nounits"])
+            .output()
+        else {
+            return Vec::new();
+        };
+        String::from_utf8_lossy(&output.stdout)
+            .lines()
+            .filter_map(|line| {
+                let mut parts = line.split(',').map(str::trim);
+                let bus = parts.next()?.to_owned();
+                let name = parts.next()?.to_owned();
+                let mib: f64 = parts.next()?.parse().ok()?;
+                Some((bus, name, mib * 1024.0 * 1024.0))
+            })
+            .collect()
+    }
+
+    /// The card's name from `lspci -mm`: "AMD Radeon RX 9070/9070 XT/9070 GRE" for
+    /// `"Navi 48 [Radeon RX 9070/9070 XT/9070 GRE]"`, with the maker in front.
+    fn lspci_name(slot: &str, maker: &str) -> Option<String> {
+        let output = Command::new("lspci").args(["-mm", "-s", slot]).output().ok()?;
+        super::lspci_card_name(&String::from_utf8_lossy(&output.stdout), maker)
+    }
+}
+
+/// The device name in one `lspci -mm` line, preferring the marketing name in brackets.
+#[cfg_attr(any(windows, target_os = "macos"), allow(dead_code))]
+fn lspci_card_name(line: &str, maker: &str) -> Option<String> {
+    // Fields: slot "class" "vendor" "device" ...
+    let quoted: Vec<&str> = line.split('"').skip(1).step_by(2).collect();
+    let device = quoted.get(2)?.trim();
+    let name = match (device.find('['), device.rfind(']')) {
+        (Some(open), Some(close)) if open < close => &device[open + 1..close],
+        _ => device,
+    };
+    let name = name.trim();
+    if name.is_empty() {
+        return None;
+    }
+    if maker.is_empty() || name.to_lowercase().contains(&maker.to_lowercase()) {
+        Some(name.to_owned())
+    } else {
+        Some(format!("{maker} {name}"))
     }
 }
 
@@ -468,4 +611,22 @@ mod tests {
             r#"{"gpus":[{"name":"X","vendor":"NVIDIA","vram_gb":null}],"ram_gb":16.0,"cpu":"Y","cpu_cores":8}"#
         );
     }
+}
+
+#[cfg(test)]
+#[test]
+fn linux_cards_and_processor_are_read() {
+    let line = r#"0000:03:00.0 "VGA compatible controller" "Advanced Micro Devices, Inc. [AMD/ATI]" "Navi 48 [Radeon RX 9070/9070 XT/9070 GRE]" -rc0 -p00 "ASRock Incorporation" "Device 5417""#;
+    assert_eq!(
+        lspci_card_name(line, "AMD").as_deref(),
+        Some("AMD Radeon RX 9070/9070 XT/9070 GRE")
+    );
+    assert_eq!(vendor("AMD Radeon RX 9070/9070 XT/9070 GRE"), Vendor::Amd);
+    let nvidia = r#"01:00.0 "VGA compatible controller" "NVIDIA Corporation" "AD104 [GeForce RTX 4070]" -ra1 "" """#;
+    assert_eq!(lspci_card_name(nvidia, "NVIDIA").as_deref(), Some("NVIDIA GeForce RTX 4070"));
+    let cpu = "processor\t: 0\nmodel name\t: Intel(R) Core(TM)  i7-14700F\nprocessor\t: 1\nmodel name\t: Intel(R) Core(TM)  i7-14700F\n";
+    assert_eq!(
+        cpuinfo_summary(cpu),
+        (Some("Intel(R) Core(TM) i7-14700F".into()), Some(2))
+    );
 }

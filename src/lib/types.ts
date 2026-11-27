@@ -126,7 +126,10 @@ export interface Snapshot {
     searching: boolean
     find_error: string | null
   }
-  tools: { ready: boolean; missing: string[] } | null
+  /** The launcher's system: "windows", "linux" or "macos". */
+  os: string
+  /** installer: what installs the missing tools ("winget", "dnf", "apt", "pacman", "zypper"), or null. */
+  tools: { ready: boolean; missing: string[]; installer: string | null } | null
   job: {
     running: boolean
     repo: string | null
