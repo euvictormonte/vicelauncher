@@ -88,7 +88,7 @@ function Presets({ project: p }: { project: Project }) {
       action={
         <Menu>
           <MenuTrigger asChild>
-            <Button size="sm" variant="ghost"><MoreHorizontal /> Import</Button>
+            <Button size="sm" variant="ghost"><MoreHorizontal /> {translate("Import")}</Button>
           </MenuTrigger>
           <MenuContent align="end">
             <MenuItem
@@ -97,16 +97,16 @@ function Presets({ project: p }: { project: Project }) {
                 if (path) void run<string>({ type: "import_preset_file", repo: p.repo, path }).then((n) => n && toast.success(translate("Imported “{name}”", { name: n })))
               }}
             >
-              <FileUp /> Import file…
+              <FileUp /> {translate("Import file…")}
             </MenuItem>
             <MenuItem onSelect={() => setPasting("")}>
-              <ClipboardPaste /> Paste preset text…
+              <ClipboardPaste /> {translate("Paste preset text…")}
             </MenuItem>
           </MenuContent>
         </Menu>
       }
     >
-      <Row label="Preset" hint={p.launch.selected_preset ? `Applied: ${p.launch.selected_preset}` : "None applied"}>
+      <Row label="Preset" hint={p.launch.selected_preset ? translate("Applied: {name}", { name: p.launch.selected_preset }) : translate("None applied")}>
         {choices.length > 0 ? (
           <Select label="Preset" value={value || choices[0].value} options={choices} onChange={setPicked} />
         ) : (

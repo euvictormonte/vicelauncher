@@ -102,13 +102,13 @@ export function ActivityTab({ project }: { project: Project }) {
         <div className="ml-auto flex gap-1">
           {!job.running && project.installed && (
             <Button size="sm" variant="ghost" title="Check every known problem, fix it and verify the result" onClick={() => void run({ type: "fix", repo: project.repo })}>
-              <Wrench /> Fix and verify
+              <Wrench /> {t("Fix and verify")}
             </Button>
           )}
           {job.stoppable && (
-            <Button size="sm" variant="danger" onClick={() => void run({ type: "stop" })}><Square /> Stop</Button>
+            <Button size="sm" variant="danger" onClick={() => void run({ type: "stop" })}><Square /> {t("Stop")}</Button>
           )}
-          <Button size="sm" variant="ghost" disabled={!lines.length} onClick={() => void copyText(lines.join("\n")).then(() => toast.success(t("Log copied")))}><Copy /> Copy</Button>
+          <Button size="sm" variant="ghost" disabled={!lines.length} onClick={() => void copyText(lines.join("\n")).then(() => toast.success(t("Log copied")))}><Copy /> {t("Copy")}</Button>
           <Button
             size="sm"
             variant="ghost"
@@ -118,7 +118,7 @@ export function ActivityTab({ project }: { project: Project }) {
               if (path) void run({ type: "export_log", path }, "Log exported")
             }}
           >
-            <Download /> Export
+            <Download /> {t("Export")}
           </Button>
         </div>
       </div>

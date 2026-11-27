@@ -11,11 +11,11 @@ import { useTheme } from "@/lib/theme"
  * Original; nothing from any game. Grain and scrims keep the words readable.
  */
 const PALETTES = [
-  { base: "#1a0b24", blobs: ["#ff3f9e", "#6d3bff", "#ff8a4c"] },
+  { base: "#1a0b24", blobs: ["#8b5cf6", "#6d3bff", "#ff8a4c"] },
   { base: "#06121f", blobs: ["#18b9d4", "#3b52ff", "#9b3bff"] },
-  { base: "#1b0a10", blobs: ["#ff5636", "#ff2f86", "#ffb24a"] },
+  { base: "#1b0a10", blobs: ["#ff5636", "#8b5cf6", "#ffb24a"] },
   { base: "#04161a", blobs: ["#23d69a", "#2a74ff", "#a64bff"] },
-  { base: "#120818", blobs: ["#ff3fa4", "#00c2d1", "#6b4bff"] },
+  { base: "#120818", blobs: ["#8b5cf6", "#00c2d1", "#6b4bff"] },
 ] as const
 
 function hash(s: string) {

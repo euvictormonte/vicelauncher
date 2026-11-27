@@ -150,7 +150,7 @@ export function Sidebar() {
         <JobCard />
         {!screenshot && (
           <Button variant="ghost" size="sm" className="w-full justify-start gap-3 px-2" onClick={() => open({ kind: "import" })}>
-            <Plus className="size-4!" /> Import a repo or build
+            <Plus className="size-4!" /> {t("Import a repo or build")}
           </Button>
         )}
       </div>

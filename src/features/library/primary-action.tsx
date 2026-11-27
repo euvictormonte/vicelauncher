@@ -77,25 +77,25 @@ export function PrimaryAction({ project: p }: { project: Project }) {
     case "install":
       return (
         <Button variant="primary" size="lg" onClick={() => void run({ type: "install", repo: p.repo })}>
-          <Download /> Install
+          <Download /> {t("Install")}
         </Button>
       )
     case "update":
       return (
         <UpdateButton repo={p.repo} variant="primary" size="lg">
-          <RefreshCw /> Update
+          <RefreshCw /> {t("Update")}
         </UpdateButton>
       )
     case "play":
       return (
         <Button variant="primary" size="lg" onClick={() => void startPlay(p.repo)}>
-          <Play className="fill-current" /> Play
+          <Play className="fill-current" /> {t("Play")}
         </Button>
       )
     case "stop":
       return (
         <Button variant="danger" size="lg" onClick={() => void run({ type: "stop" })}>
-          <Square /> Stop
+          <Square /> {t("Stop")}
         </Button>
       )
     case "nothing":

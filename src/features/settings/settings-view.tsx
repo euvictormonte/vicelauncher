@@ -163,11 +163,11 @@ export function SettingsView() {
         </Group>
 
         <Group title="About">
-          <Row label={t("{name} by the {team}", { name: snap.brand.name, team: snap.brand.team })} hint="The library comes from VIPortLive, built on PortWatch's tracker. The projects are their authors' work, built on VIctory by Marvisak and its contributors.">
-            <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.site)}><ExternalLink /> {snap.brand.site_label}</Button>
+          <Row label={t("Neves Launcher community")} hint={t("An independently maintained launcher for organizing, installing, updating and starting community projects, with its own interface in Brazilian Portuguese and English. It does not distribute game files.")}>
+            <Button size="sm" variant="ghost" onClick={() => void openUrl("https://discord.gg/pfuXKQCSYq")}><ExternalLink /> {t("Community Discord")}</Button>
           </Row>
-          <Row label="Forked from VILauncher" hint="VILauncher is based on Mandyhub by Zettrox. Free software under the GNU General Public License v3 or later. Redesign by ellion369; save picker, checkpoints, presets and build tracking by TheGameOnAddict.">
-            <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.source)}><ExternalLink /> Upstream source</Button>
+          <Row label={t("Origins and credits")} hint={t("This Neves Launcher edition reworks VI Launcher with its own visual identity, a redesigned interface and Brazilian Portuguese localization while preserving the project’s core features. VI Launcher, in turn, is based on Mandyhub by Zettrox. We also credit ellion369’s redesign and TheGameOnAddict’s save picker, checkpoints, presets and build tracking. Free software under the GNU GPL v3 or later.")}>
+            <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.source)}><ExternalLink /> {t("View Neves Launcher on GitHub")}</Button>
           </Row>
           <Row label="Legal notice" hint="You provide your own copy of the game, and you are responsible for what you install, build and run. Neves Launcher only manages the projects.">
             <Button size="sm" variant="ghost" onClick={() => useStore.getState().open({ kind: "notice" })}>Read</Button>
