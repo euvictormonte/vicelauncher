@@ -13,17 +13,27 @@ import { cn } from "@/lib/utils"
 import { ActionNote, PrimaryAction } from "./primary-action"
 import { useUpdateWarning } from "./update-button"
 import { t } from "@/lib/i18n"
-import viceCityBanner from "../../../assets/vice-city-banner.webp"
+import luciaBanner from "../../../assets/banner-lucia.jpg"
+import jasonBanner from "../../../assets/banner-jason.jpg"
+import viceCityBoatBanner from "../../../assets/banner-vice-city-boat.jpg"
+import viceCityBanner from "../../../assets/banner-vice-city.jpg"
+
+const HERO_BANNERS = [
+  { src: luciaBanner, position: "center 12%" },
+  { src: jasonBanner, position: "center 8%" },
+  { src: viceCityBoatBanner, position: "center 50%" },
+  { src: viceCityBanner, position: "center 24%" },
+]
 
 export function Hero({ project: p }: { project: Project }) {
   const snap = useStore((s) => s.snap)!
   const screenshot = useStore((s) => s.screenshot)
   const alias = useAlias()(p)
   const playing = snap.job.running && snap.job.stage === "Playing"
-  const source = p.kind === "zip" ? t("Imported build") : p.custom ? t("Added by link") : "VIPortLive"
+  const source = p.kind === "zip" ? t("Imported build") : p.custom ? t("Added by link") : "PortWatch VI"
   return (
     <section className="relative isolate shrink-0" style={{ minHeight: "clamp(350px, 38vh, 430px)" }}>
-      <Aurora seed={p.repo} still={playing} pictures={screenshot ? [] : snap.backgrounds} art={alias.owner ? avatarUrl(alias.owner, 256) : null} fallbackImage={screenshot ? undefined : viceCityBanner} />
+      <Aurora seed={p.repo} still={playing} pictures={screenshot ? [] : snap.backgrounds} art={alias.owner ? avatarUrl(alias.owner, 256) : null} fallbackImages={screenshot ? [] : HERO_BANNERS} />
       <div className="relative z-10 flex h-full min-h-[inherit] max-w-[1280px] flex-col justify-end px-10 pt-16 pb-8">
         <div className="flex items-end gap-6">
           <ProjectAvatar project={p} owner={alias.owner} size={88} className="shadow-[0_12px_32px_-8px_rgb(0_0_0/0.6)]" />
@@ -114,22 +124,22 @@ function MoreMenu({ project: p }: { project: Project }) {
       <MenuContent>
         {p.installed && p.kind === "git" && (
           <MenuItem disabled={p.checking} onSelect={() => void run({ type: "check_repo", repo: p.repo })}>
-            <RefreshCw /> Check for updates
+            <RefreshCw /> {t("Check for updates")}
           </MenuItem>
         )}
         {p.installed && !p.standalone && p.kind !== "local" && (
           <MenuItem disabled={busy || !snap.files.ok} onSelect={() => void run({ type: "warm", repo: p.repo })}>
-            <Wrench /> Warm up shaders
+            <Wrench /> {t("Warm up shaders")}
           </MenuItem>
         )}
         {p.installed && p.kind === "git" && (
           <MenuItem disabled={busy} onSelect={warning.ask}>
-            <RotateCcw /> Reinstall
+            <RotateCcw /> {t("Reinstall")}
           </MenuItem>
         )}
         {!screenshot && (
           <MenuItem onSelect={() => void run({ type: "open", what: "project_folder", repo: p.repo })} disabled={!p.installed}>
-            <FolderOpen /> Show in folder
+            <FolderOpen /> {t("Show in folder")}
           </MenuItem>
         )}
         {p.web_url && !screenshot && (
@@ -140,18 +150,18 @@ function MoreMenu({ project: p }: { project: Project }) {
                 .catch((error) => toast.error(t(String(error))))
             }
           >
-            <Copy /> Copy link
+            <Copy /> {t("Copy link")}
           </MenuItem>
         )}
         {(p.installed && p.kind !== "local") || p.custom ? <MenuSeparator /> : null}
         {p.installed && p.kind !== "local" && (
           <MenuItem tone="danger" disabled={busy} onSelect={() => open({ kind: "uninstall", repo: p.repo })}>
-            <Trash2 /> Uninstall…
+            <Trash2 /> {t("Uninstall…")}
           </MenuItem>
         )}
         {p.custom && p.kind === "git" && (
           <MenuItem tone="danger" onSelect={() => void run({ type: "remove_custom", repo: p.repo }, "Removed from your library")}>
-            <X /> Remove from library
+            <X /> {t("Remove from library")}
           </MenuItem>
         )}
       </MenuContent>

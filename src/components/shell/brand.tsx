@@ -21,13 +21,16 @@ export function Brand() {
         src="/logo.png"
         alt=""
         onClick={onLogo}
-        className="size-6 rounded-[6px] [-webkit-app-region:no-drag]"
+        className="size-6 shrink-0 rounded-[6px] [-webkit-app-region:no-drag]"
         draggable={false}
       />
-      <span className="flex items-baseline leading-none">
-        <span className="font-display text-[17px] font-extrabold tracking-[-0.02em] text-fg">Neves</span>
-        <span className="ml-1 font-script text-[21px] text-accent-fg">Launcher</span>
-      </span>
+      <img
+        src="/neves-launcher-logo.svg"
+        alt="Neves Launcher"
+        onClick={onLogo}
+        className="h-auto w-[180px] max-w-[calc(100%-2rem)] object-contain [-webkit-app-region:no-drag]"
+        draggable={false}
+      />
       {theme === "paws" && <PawPrint aria-hidden className="ml-1 size-3.5 text-accent-fg" />}
     </div>
   )

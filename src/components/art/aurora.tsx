@@ -27,9 +27,10 @@ function hash(s: string) {
 const GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")"
 
-type AuroraProps = { seed: string; still?: boolean; pictures?: string[]; art?: string | null; fallbackImage?: string }
+type AuroraBanner = { src: string; position: string }
+type AuroraProps = { seed: string; still?: boolean; pictures?: string[]; art?: string | null; fallbackImage?: string; fallbackImages?: AuroraBanner[] }
 
-function AuroraArt({ seed, still, pictures = [], art, fallbackImage }: AuroraProps) {
+function AuroraArt({ seed, still, pictures = [], art, fallbackImage, fallbackImages = [] }: AuroraProps) {
   const [artFailed, setArtFailed] = useState<string | null>(null)
   const reduced = useReducedMotion()
   const h = hash(seed)
@@ -47,6 +48,8 @@ function AuroraArt({ seed, still, pictures = [], art, fallbackImage }: AuroraPro
     <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ background: palette.base }} aria-hidden>
       {pictures.length > 0 ? (
         <Pictures paths={pictures} moving={moving} />
+      ) : fallbackImages.length > 0 ? (
+        <FallbackSlideshow images={fallbackImages} moving={moving} />
       ) : fallbackImage ? (
         <motion.img
           src={fallbackImage}
@@ -87,6 +90,32 @@ function AuroraArt({ seed, still, pictures = [], art, fallbackImage }: AuroraPro
       <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgb(12 11 16 / 0.78) 0%, rgb(12 11 16 / 0.45) 40%, rgb(12 11 16 / 0) 70%)" }} />
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgb(12 11 16 / 0.35) 0%, rgb(12 11 16 / 0) 22%, rgb(12 11 16 / 0) 55%, rgb(12 11 16 / 0.92) 92%, #0c0b10 100%)" }} />
     </div>
+  )
+}
+
+function FallbackSlideshow({ images, moving }: { images: AuroraBanner[]; moving: boolean }) {
+  const [index, setIndex] = useState(0)
+  useEffect(() => {
+    if (images.length < 2 || !moving) return
+    const timer = setInterval(() => setIndex((current) => (current + 1) % images.length), 8000)
+    return () => clearInterval(timer)
+  }, [images, moving])
+
+  return (
+    <AnimatePresence initial={false}>
+      <motion.img
+        key={images[index].src}
+        src={images[index].src}
+        alt=""
+        draggable={false}
+        className="absolute inset-0 size-full object-cover"
+        style={{ objectPosition: images[index].position }}
+        initial={{ opacity: 0, scale: 1.04 }}
+        animate={{ opacity: 1, scale: moving ? [1.04, 1.1, 1.04] : 1.04 }}
+        exit={{ opacity: 0 }}
+        transition={{ opacity: { duration: 2.2, ease: "easeInOut" }, scale: { duration: 24, repeat: moving ? Infinity : 0, ease: "easeInOut" } }}
+      />
+    </AnimatePresence>
   )
 }
 

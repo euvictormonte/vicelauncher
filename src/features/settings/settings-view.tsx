@@ -127,7 +127,7 @@ export function SettingsView() {
               <GraphicsGroups graphics={s.graphics} onChange={(graphics) => void run({ type: "set_default_graphics", graphics })} />
             </div>
 
-            <Group title="Shaders and launch" description="VIctory can translate the game's shaders before you play, so the game doesn't stop to do it on the way. Each project keeps its own cache.">
+            <Group title="Shaders and launch" description={t("VIctory can translate the game's shaders before you play, so the game doesn't stop to do it on the way. Each project keeps its own cache.")}>
               <Row label="Warm up shaders before playing" hint="Runs each time you press Play. The first one takes minutes and about 1.3 GB.">
                 <Switch checked={s.warm_before_play} onCheckedChange={(v) => void run({ type: "set_settings", patch: { warm_before_play: v } })} aria-label="Warm up shaders before playing" />
               </Row>

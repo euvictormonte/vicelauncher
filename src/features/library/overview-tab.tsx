@@ -16,7 +16,7 @@ export function OverviewTab({ project: p }: { project: Project }) {
   const alias = useAlias()(p)
   const description = screenshot
     ? t("Project description hidden.")
-    : p.summary.trim() || (p.kind === "zip" ? t("A prebuilt build you imported from a ZIP.") : p.kind === "local" ? t("A build from a folder on this PC.") : t("The tracker has no write-up for this build yet."))
+    : (p.summary.trim() ? t(p.summary.trim()) : (p.kind === "zip" ? t("A prebuilt build you imported from a ZIP.") : p.kind === "local" ? t("A build from a folder on this PC.") : t("The tracker has no write-up for this build yet.")))
 
   return (
     <div className="space-y-5">
