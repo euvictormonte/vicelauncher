@@ -129,7 +129,7 @@ function Presets({ project: p }: { project: Project }) {
               >
                 <Download /> Export file…
               </MenuItem>
-              <MenuItem onSelect={() => void run<string>({ type: "preset_text", name: selectedName }).then((text) => text && copyText(text).then(() => toast.success(translate("Preset text copied")))}>
+              <MenuItem onSelect={() => void run<string>({ type: "preset_text", name: selectedName }).then((text) => text && copyText(text).then(() => toast.success(translate("Preset text copied"))))}>
                 <Copy /> Copy preset text
               </MenuItem>
               <MenuSeparator />
