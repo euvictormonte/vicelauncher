@@ -11,8 +11,8 @@ pub const SITE_LABEL: &str = "viportlive.com";
 /// The launcher's own code and releases on GitHub (`owner/name`).
 pub const REPOSITORY: &str = "euvictormonte/vicelauncher";
 pub const SOURCE_URL: &str = "https://github.com/euvictormonte/vicelauncher";
-/// The release download the updater looks for.
-pub const RELEASE_ASSET: &str = "Neves Launcher.exe";
+/// GitHub-normalized release asset name used by the in-app updater.
+pub const RELEASE_ASSET: &str = "Neves.Launcher.exe";
 
 /// Where the list of projects comes from, tried in order: VIPortLive's
 /// launcher feed (PortWatch's tracker with VIPortLive's corrections and

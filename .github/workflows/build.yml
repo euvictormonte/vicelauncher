@@ -119,8 +119,8 @@ jobs:
           name: Neves Launcher-setup
           path: release/installer
 
-      # The in-app updater looks for an asset named exactly Neves Launcher.exe and
-      # checks it against the sha256 digest GitHub records for the upload.
+      # GitHub normalizes spaces in this asset name to periods; the in-app updater
+      # matches the API name `Neves.Launcher.exe` and verifies its SHA-256 digest.
       - uses: softprops/action-gh-release@v2
         with:
           name: Neves Launcher ${{ github.ref_name }}
