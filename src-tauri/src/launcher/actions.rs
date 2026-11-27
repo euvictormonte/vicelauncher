@@ -260,6 +260,8 @@ impl App {
                 let mut private = vec![
                     std::env::var("USERNAME").unwrap_or_default(),
                     std::env::var("USERPROFILE").unwrap_or_default(),
+                    std::env::var("USER").unwrap_or_default(),
+                    std::env::var("HOME").unwrap_or_default(),
                     self.saved.install_dir.clone(),
                     self.saved.game_dir.clone(),
                     workspace().display().to_string(),
@@ -841,26 +843,8 @@ impl App {
             j.pid
         };
         if let Some(pid) = pid {
-            #[cfg(windows)]
-            {
-                // A window close first, so the game can save; forced only if it is still running a few seconds later.
-                let pid = pid.to_string();
-                std::thread::spawn(move || {
-                    let mut close = Command::new("taskkill");
-                    close.args(["/PID", &pid, "/T"]);
-                    hide_window(&mut close);
-                    let _ = close.status();
-                    std::thread::sleep(std::time::Duration::from_secs(8));
-                    let mut force = Command::new("taskkill");
-                    force.args(["/PID", &pid, "/T", "/F"]);
-                    hide_window(&mut force);
-                    let _ = force.status();
-                });
-            }
-            #[cfg(not(windows))]
-            {
-                let _ = Command::new("kill").arg(pid.to_string()).spawn();
-            }
+            // A window close first, so the game can save; forced only if it is still running a few seconds later.
+            crate::platform::stop_tree(pid);
         }
     }
 
@@ -908,7 +892,7 @@ fn known_responsibility(id: &str) -> Option<&'static str> {
 }
 
 /// Opens an https link in the player's browser. Only plain https links are accepted, and no shell
-/// is involved: the link is passed to Explorer as one argument.
+/// is involved: the link is passed to the system's opener as one argument.
 fn open_link(url: &str) -> Result<(), String> {
     let plain = url.len() <= 2048
         && url.starts_with("https://")
@@ -916,26 +900,11 @@ fn open_link(url: &str) -> Result<(), String> {
     if !plain {
         return Err("Only https links can be opened from the launcher.".into());
     }
-    std::process::Command::new("explorer.exe")
-        .arg(url)
-        .spawn()
-        .map(|_| ())
-        .map_err(|error| format!("Could not open the link: {error}"))
+    crate::platform::open_url(url).map_err(|_| "Could not open the link.".to_string())
 }
 
 fn open_folder(path: &Path) -> Result<(), String> {
-    let program = if cfg!(windows) {
-        "explorer"
-    } else if cfg!(target_os = "macos") {
-        "open"
-    } else {
-        "xdg-open"
-    };
-    Command::new(program)
-        .arg(path)
-        .spawn()
-        .map(|_| ())
-        .map_err(|e| format!("Could not open {}: {e}", path.display()))
+    crate::platform::open_folder(path)
 }
 
 /// The saves a project can start from: this build's, other builds' and the favourites.

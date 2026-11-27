@@ -103,7 +103,8 @@ function snapshot(): Snapshot {
       acknowledged: state.acknowledged,
     },
     files: { chosen: !!state.gameDir, ok: !!state.gameDir, empty: false, unplugged: false, missing: state.gameDir ? [] : [], searching: false, find_error: null },
-    tools: { ready: state.toolsReady, missing: state.toolsReady ? [] : ["C++ build tools"] },
+    os: "windows",
+    tools: { ready: state.toolsReady, missing: state.toolsReady ? [] : ["C++ build tools"], installer: state.toolsReady ? null : "winget" },
     job: {
       running: !!state.job,
       repo: state.job?.repo ?? null,

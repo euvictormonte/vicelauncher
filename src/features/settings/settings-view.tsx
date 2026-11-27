@@ -14,6 +14,7 @@ import { pawsUnlocked, setTheme, THEMES, type Theme, useTheme } from "@/lib/them
 import { run, useStore } from "@/lib/store"
 import type { StorageView } from "@/lib/types"
 import { setLanguage, t as translate, useLanguage, useT } from "@/lib/i18n"
+import { toolsInstallHint } from "@/lib/platform"
 import { getNickname, PROFILE_CHANGED_EVENT, saveNickname } from "@/lib/profile"
 import { toast } from "sonner"
 
@@ -113,7 +114,7 @@ export function SettingsView() {
             </Group>
 
             <Group title="Build tools" description="Projects are downloaded with Git and built with Rust and the C++ build tools, once, on this PC.">
-              <Row label={!snap.tools ? "Checking…" : snap.tools.ready ? "Git, Rust and the C++ build tools are ready" : t("Missing {tools}", { tools: snap.tools.missing.join(", ") })} hint={snap.tools && !snap.tools.ready ? "Installs with winget; Windows asks for permission." : undefined}>
+              <Row label={!snap.tools ? "Checking…" : snap.tools.ready ? "Git, Rust and the C++ build tools are ready" : t("Missing {tools}", { tools: snap.tools.missing.join(", ") })} hint={snap.tools && !snap.tools.ready ? toolsInstallHint(snap) : undefined}>
                 {snap.tools && !snap.tools.ready && <Button size="sm" variant="primary" disabled={busy} onClick={() => void run({ type: "install_tools" })}>Install missing tools</Button>}
                 {snap.tools?.ready && <Dot ok />}
               </Row>

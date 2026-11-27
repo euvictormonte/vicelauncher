@@ -11,8 +11,12 @@ pub const SITE_LABEL: &str = "viportlive.com";
 /// The launcher's own code and releases on GitHub (`owner/name`).
 pub const REPOSITORY: &str = "euvictormonte/vicelauncher";
 pub const SOURCE_URL: &str = "https://github.com/euvictormonte/vicelauncher";
-/// GitHub-normalized release asset name used by the in-app updater.
+/// GitHub-normalized release asset name used by the in-app updater: the portable
+/// exe on Windows, the AppImage on Linux (GitHub turns the spaces into periods).
+#[cfg(windows)]
 pub const RELEASE_ASSET: &str = "Neves.Launcher.exe";
+#[cfg(not(windows))]
+pub const RELEASE_ASSET: &str = "Neves.Launcher-x86_64.AppImage";
 
 /// Where the list of projects comes from, tried in order: VIPortLive's
 /// launcher feed (PortWatch's tracker with VIPortLive's corrections and
@@ -22,7 +26,8 @@ pub const PROJECT_SOURCES: &[(&str, &str)] = &[
     ("PortWatch", "https://portwatch-vi.xyz/data/tracker.json"),
 ];
 
-/// The folder under %LOCALAPPDATA% (projects, pictures) and %APPDATA% (settings).
+/// The folder under %LOCALAPPDATA% (projects, pictures) and %APPDATA% (settings);
+/// on Linux under $XDG_DATA_HOME (~/.local/share) for both.
 pub const FOLDER: &str = "Neves Launcher";
 /// The launcher's earlier names: settings are carried over from these and
 /// already installed projects are found there (see `migrate_old_folders`).

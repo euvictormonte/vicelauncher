@@ -17,6 +17,7 @@ mod job_log;
 mod launcher;
 mod notify;
 mod patches;
+mod platform;
 mod previous;
 mod report;
 mod rust_project;
@@ -83,7 +84,7 @@ fn begin_discord_login(handle: tauri::AppHandle) -> Result<String, String> {
 }
 
 fn main() {
-    // Fix and verify without a window, for the agent tool (scripts\neves-launcher-agent.mjs fix):
+    // Fix and verify without a window, for the agent tool (scripts/neves-launcher-agent.mjs fix):
     // `--fix <repo>` prints the job's log and a STAGE line. Debug and release builds alike.
     // It refuses (exit 1) unless AI agent access is on, and while another launcher window runs.
     if let Some(at) = std::env::args().position(|a| a == "--fix") {
@@ -138,6 +139,13 @@ fn main() {
         return;
     }
     launcher::migrate_old_folders();
+    // WebKitGTK's DMA-BUF renderer shows a blank window with NVIDIA's own driver.
+    #[cfg(target_os = "linux")]
+    if std::path::Path::new("/proc/driver/nvidia").exists()
+        && std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none()
+    {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -178,7 +186,7 @@ fn main() {
 }
 
 /// Why `--fix` may not run now, or `Ok` when it may: AI agent access must be on in
-/// settings.json, and no other Neves Launcher.exe (the window) may be running.
+/// settings.json, and no other Neves Launcher (the window) may be running.
 fn fix_allowed() -> Result<(), String> {
     let text = std::fs::read_to_string(settings_store::file()).unwrap_or_default();
     let settings: serde_json::Value =
@@ -194,29 +202,14 @@ fn fix_allowed() -> Result<(), String> {
     Ok(())
 }
 
-/// Whether a Neves Launcher.exe other than this process runs (checked with tasklist, CSV: "name","pid",...).
+/// Whether a Neves Launcher other than this process runs.
 fn other_launcher_running() -> Result<bool, String> {
-    let mut command = std::process::Command::new("tasklist");
-    command.args(["/FI", "IMAGENAME eq Neves Launcher.exe", "/FO", "CSV", "/NH"]);
-    hide_window(&mut command);
-    let output = command
-        .output()
-        .map_err(|_| "could not check whether Neves Launcher is running (tasklist failed), so Fix was not started".to_string())?;
-    if !output.status.success() {
-        return Err("could not check whether Neves Launcher is running (tasklist failed), so Fix was not started".into());
-    }
-    let me = std::process::id();
-    let text = String::from_utf8_lossy(&output.stdout);
-    Ok(text
-        .lines()
-        .filter_map(|line| line.split(',').nth(1))
-        .filter_map(|pid| pid.trim().trim_matches('"').parse::<u32>().ok())
-        .any(|pid| pid != me))
+    platform::other_launcher_running()
 }
 
 /// The system's own glass behind the window: Mica on Windows 11 (Acrylic on
 /// Windows 10), the sidebar material on macOS. The UI keeps its own dark
-/// ground where none is available.
+/// ground where none is available (Linux).
 fn glass(window: &tauri::WebviewWindow) {
     #[cfg(windows)]
     {
