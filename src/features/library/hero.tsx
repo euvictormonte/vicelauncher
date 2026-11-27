@@ -1,4 +1,4 @@
-import { BadgeCheck, Copy, ExternalLink, FolderOpen, MoreHorizontal, RefreshCw, RotateCcw, Trash2, Wrench, X } from "lucide-react"
+import { BadgeCheck, CheckCircle2, Copy, ExternalLink, FolderOpen, MoreHorizontal, RefreshCw, RotateCcw, Trash2, Wrench, X } from "lucide-react"
 import { Aurora } from "@/components/art/aurora"
 import { avatarUrl, ProjectAvatar } from "@/components/art/project-avatar"
 import { Button } from "@/components/ui/button"
@@ -6,24 +6,14 @@ import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@/compo
 import { Tooltip } from "@/components/ui/tooltip"
 import { toast } from "sonner"
 import { copyText, openUrl } from "@/lib/api"
-import { fps, gpuText } from "@/lib/format"
+import { fps, gpuText, relativeAge } from "@/lib/format"
 import { run, useAlias, useStore } from "@/lib/store"
 import type { Project } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { ActionNote, PrimaryAction } from "./primary-action"
 import { useUpdateWarning } from "./update-button"
 import { t } from "@/lib/i18n"
-
-/**
- * The summary's first sentence, whole, or nothing: never cut mid-word. Too
- * long for two lines under the title, or no full sentence at all (the
- * tracker's text can be clipped), and it is left to Overview > About.
- */
-export function leadSentence(summary: string): string | null {
-  const m = summary.trim().match(/^[\s\S]+?[.!?](?=["”’)]?(\s+["“(]?[A-Z0-9]|\s*$))/)
-  const s = m?.[0].trim()
-  return s && s.length <= 170 ? s : null
-}
+import viceCityBanner from "../../../assets/vice-city-banner.webp"
 
 export function Hero({ project: p }: { project: Project }) {
   const snap = useStore((s) => s.snap)!
@@ -31,16 +21,19 @@ export function Hero({ project: p }: { project: Project }) {
   const alias = useAlias()(p)
   const playing = snap.job.running && snap.job.stage === "Playing"
   const source = p.kind === "zip" ? t("Imported build") : p.custom ? t("Added by link") : "VIPortLive"
-  const lead = screenshot ? null : leadSentence(p.summary)
   return (
     <section className="relative isolate shrink-0" style={{ minHeight: "clamp(350px, 38vh, 430px)" }}>
-      <Aurora seed={p.repo} still={playing} pictures={screenshot ? [] : snap.backgrounds} art={alias.owner ? avatarUrl(alias.owner, 256) : null} />
+      <Aurora seed={p.repo} still={playing} pictures={screenshot ? [] : snap.backgrounds} art={alias.owner ? avatarUrl(alias.owner, 256) : null} fallbackImage={screenshot ? undefined : viceCityBanner} />
       <div className="relative z-10 flex h-full min-h-[inherit] max-w-[1280px] flex-col justify-end px-10 pt-16 pb-8">
         <div className="flex items-end gap-6">
           <ProjectAvatar project={p} owner={alias.owner} size={88} className="shadow-[0_12px_32px_-8px_rgb(0_0_0/0.6)]" />
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-2 text-body text-fg-2">
-              <span>{source}</span>
+              {p.installed ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/15 px-3 py-1 text-caption font-semibold text-accent-fg">
+                  <CheckCircle2 className="size-3.5" /> {t("Installed")}
+                </span>
+              ) : <span>{source}</span>}
               {p.verified && (
                 <>
                   <span className="text-fg-4">·</span>
@@ -53,8 +46,12 @@ export function Hero({ project: p }: { project: Project }) {
             </h1>
           </div>
         </div>
-        {lead && <p className="mt-4 max-w-[640px] text-lead text-pretty text-fg-2" data-selectable>{lead}</p>}
-        <Stats project={p} />
+        {p.activity && (
+          <p className="mt-3 text-secondary text-fg-3">
+            {relativeAge(p.activity.updated_ago)}
+            {p.activity.last_run && <> <span className="px-1 text-fg-4">·</span> {t("Last played {time}", { time: p.activity.last_run })}</>}
+          </p>
+        )}
         <div className="mt-6 flex items-center gap-2">
           <PrimaryAction project={p} />
           {p.web_url && !screenshot && (
@@ -69,6 +66,7 @@ export function Hero({ project: p }: { project: Project }) {
         <div className="mt-3 min-h-5">
           <ActionNote project={p} />
         </div>
+        <Stats project={p} />
       </div>
     </section>
   )

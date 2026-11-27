@@ -8,13 +8,14 @@ import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { GraphicsGroups } from "@/features/library/graphics-tab"
 import { ResponsibilityDialog } from "@/features/shared/responsibility"
-import { openUrl, pickFolder } from "@/lib/api"
+import { beginDiscordLogin, discordErrorMessage, openUrl, pickFolder } from "@/lib/api"
 import { useDraft } from "@/lib/hooks"
 import { pawsUnlocked, setTheme, THEMES, type Theme, useTheme } from "@/lib/theme"
 import { run, useStore } from "@/lib/store"
 import type { StorageView } from "@/lib/types"
 import { setLanguage, t as translate, useLanguage, useT } from "@/lib/i18n"
-import { getNickname, saveNickname } from "@/lib/profile"
+import { getNickname, PROFILE_CHANGED_EVENT, saveNickname } from "@/lib/profile"
+import { toast } from "sonner"
 
 export function SettingsView() {
   const snap = useStore((s) => s.snap)!
@@ -30,7 +31,21 @@ export function SettingsView() {
   ]
   const [askAgents, setAskAgents] = useState(false)
   const [nickname, setNicknameDraft] = useState(getNickname)
-  const [discordInfo, setDiscordInfo] = useState(false)
+  const [discordBusy, setDiscordBusy] = useState(false)
+  useEffect(() => {
+    const onProfileChanged = (event: Event) => {
+      const name = (event as CustomEvent<string>).detail
+      if (name) setNicknameDraft(name)
+    }
+    window.addEventListener(PROFILE_CHANGED_EVENT, onProfileChanged)
+    return () => window.removeEventListener(PROFILE_CHANGED_EVENT, onProfileChanged)
+  }, [])
+  const connectDiscord = async () => {
+    setDiscordBusy(true)
+    try { await beginDiscordLogin() }
+    catch (error) { toast.error(discordErrorMessage(error)) }
+    finally { setDiscordBusy(false) }
+  }
   // Turning agents on needs the warning once; the switch only moves after Continue.
   const turnOnAgents = () =>
     s.acknowledged.includes("agent-access") ? void run({ type: "set_agent_access", enabled: true }) : setAskAgents(true)
@@ -61,8 +76,8 @@ export function SettingsView() {
               <Button type="submit" size="sm" disabled={!nickname.trim()}>{t("Save name")}</Button>
             </form>
           </Row>
-          <Row label="Discord" hint={discordInfo ? "Discord sign-in needs an OAuth app and callback configured for this launcher." : "Connect a Discord account to use its profile name."}>
-            <Button type="button" size="sm" variant="secondary" onClick={() => setDiscordInfo(true)}>{t("Continue with Discord")}</Button>
+          <Row label="Discord" hint="Connect a Discord account to use its profile name.">
+            <Button type="button" size="sm" variant="secondary" disabled={discordBusy} onClick={() => void connectDiscord()}>{t("Continue with Discord")}</Button>
           </Row>
         </Group>}
 

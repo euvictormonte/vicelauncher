@@ -27,9 +27,9 @@ function hash(s: string) {
 const GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")"
 
-type AuroraProps = { seed: string; still?: boolean; pictures?: string[]; art?: string | null }
+type AuroraProps = { seed: string; still?: boolean; pictures?: string[]; art?: string | null; fallbackImage?: string }
 
-function AuroraArt({ seed, still, pictures = [], art }: AuroraProps) {
+function AuroraArt({ seed, still, pictures = [], art, fallbackImage }: AuroraProps) {
   const [artFailed, setArtFailed] = useState<string | null>(null)
   const reduced = useReducedMotion()
   const h = hash(seed)
@@ -47,6 +47,16 @@ function AuroraArt({ seed, still, pictures = [], art }: AuroraProps) {
     <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ background: palette.base }} aria-hidden>
       {pictures.length > 0 ? (
         <Pictures paths={pictures} moving={moving} />
+      ) : fallbackImage ? (
+        <motion.img
+          src={fallbackImage}
+          alt=""
+          draggable={false}
+          className="absolute inset-0 size-full object-cover object-[center_42%]"
+          initial={{ opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 1, scale: moving ? 1.08 : 1.02 }}
+          transition={{ opacity: { duration: 1 }, scale: { duration: 24, repeat: moving ? Infinity : 0, ease: "easeInOut" } }}
+        />
       ) : art && artFailed !== art ? (
         <Wash key={art} src={art} moving={moving} onFail={() => setArtFailed(art)} />
       ) : (

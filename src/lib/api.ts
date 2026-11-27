@@ -1,4 +1,5 @@
 import type { Action, LogView, Snapshot } from "./types"
+import { t } from "./i18n"
 
 /** True inside the Tauri window; false in a plain browser (development, with a mock launcher). */
 export const inTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
@@ -112,6 +113,31 @@ export async function openUrl(url: string) {
     }
   }
   window.open(url, "_blank", "noopener")
+}
+
+/** Starts the native Discord OAuth flow and opens its authorization page. */
+export async function beginDiscordLogin() {
+  if (!inTauri) throw new Error("Discord sign-in is available in the installed launcher.")
+  const { invoke } = await import("@tauri-apps/api/core")
+  const authorizationUrl = await invoke<string>("begin_discord_login")
+  await openUrl(authorizationUrl)
+}
+
+/** Makes backend OAuth errors readable in the launcher's selected language. */
+export function discordErrorMessage(error: unknown) {
+  const message = String(error).replace(/^Error:\s*/, "")
+  const dynamic: [prefix: string, template: string][] = [
+    ["Could not open the local Discord callback: ", "Could not open the local Discord callback: {reason}"],
+    ["Could not prepare the local Discord callback: ", "Could not prepare the local Discord callback: {reason}"],
+    ["Could not prepare secure Discord sign-in: ", "Could not prepare secure Discord sign-in: {reason}"],
+    ["Could not start Discord sign-in: ", "Could not start Discord sign-in: {reason}"],
+    ["The local Discord callback failed: ", "The local Discord callback failed: {reason}"],
+  ]
+  for (const [prefix, template] of dynamic) {
+    if (message.startsWith(prefix)) return t(template, { reason: message.slice(prefix.length) })
+  }
+  if (message.startsWith("Discord authorization was cancelled")) return t("Discord authorization was cancelled.")
+  return t(message)
 }
 
 /** A local picture as the window can load it. */

@@ -51,3 +51,14 @@ export function shortStage(stage: string) {
   if (stage === "Playing") return t("Playing")
   return stage
 }
+
+/** A localized, compact age from the launcher backend's activity label. */
+export function relativeAge(value: string) {
+  const match = value.match(/^(?:Updated|Installed) (?:(\d+) (minute|hour|day)s? ago|(just now))$/)
+  if (!match) return value
+  if (match[3]) return t("just now")
+  if (!match[1] || !match[2]) return value
+  const count = Number(match[1])
+  const unit = `${match[2]}${count === 1 ? "" : "s"}`
+  return t("{count} {unit} ago", { count, unit: t(unit) })
+}

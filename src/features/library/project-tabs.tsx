@@ -1,3 +1,4 @@
+import { Activity, ChartNoAxesColumn, FileText, House, Settings2 } from "lucide-react"
 import { motion } from "motion/react"
 import { useRef } from "react"
 import { useStore, type ProjectTab } from "@/lib/store"
@@ -17,6 +18,8 @@ const TABS: { id: ProjectTab; label: string }[] = [
   { id: "notes", label: "Notes" },
   { id: "activity", label: "Activity" },
 ]
+
+const TAB_ICONS = { overview: House, graphics: ChartNoAxesColumn, launch: Settings2, notes: FileText, activity: Activity }
 
 const tabId = (id: ProjectTab) => `project-tab-${id}`
 const PANEL = "project-tabpanel"
@@ -56,6 +59,7 @@ export function ProjectTabs({ project }: { project: Project }) {
               tab === t.id ? "text-fg" : "text-fg-3 hover:text-fg-2",
             )}
           >
+            <TabIcon id={t.id} active={tab === t.id} />
             {translate(t.label)}
             {t.id === "activity" && running && <span className="size-1.5 rounded-full bg-accent" aria-label={translate("Running")} />}
             {tab === t.id && <motion.span layoutId="tab-line" className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-accent" transition={{ type: "spring", duration: 0.3, bounce: 0.1 }} />}
@@ -88,4 +92,9 @@ export function ProjectTabs({ project }: { project: Project }) {
       </motion.div>
     </div>
   )
+}
+
+function TabIcon({ id, active }: { id: ProjectTab; active: boolean }) {
+  const Icon = TAB_ICONS[id]
+  return <Icon className={cn("size-4", active ? "text-accent-fg" : "text-fg-4")} aria-hidden="true" />
 }

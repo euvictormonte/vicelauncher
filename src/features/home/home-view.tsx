@@ -10,6 +10,9 @@ import type { Project } from "@/lib/types"
 import { t } from "@/lib/i18n"
 import { PrimaryAction } from "@/features/library/primary-action"
 import { finishWelcome, getNickname, hasCompletedWelcome, saveNickname as persistNickname } from "@/lib/profile"
+import { PROFILE_CHANGED_EVENT } from "@/lib/profile"
+import { beginDiscordLogin, discordErrorMessage } from "@/lib/api"
+import { toast } from "sonner"
 
 export function HomeView() {
   const snap = useStore((s) => s.snap)!
@@ -35,6 +38,18 @@ export function HomeView() {
     const pick = all.find((p) => p.installed) ?? snap.list.items[0] ?? all[0]
     if (pick) void run({ type: "select", repo: pick.repo })
   }, [selected, snap])
+
+  useEffect(() => {
+    const onProfileChanged = (event: Event) => {
+      const name = (event as CustomEvent<string>).detail
+      if (name) {
+        setNickname(name)
+        setWelcomeOpen(false)
+      }
+    }
+    window.addEventListener(PROFILE_CHANGED_EVENT, onProfileChanged)
+    return () => window.removeEventListener(PROFILE_CHANGED_EVENT, onProfileChanged)
+  }, [])
 
   const showProject = (project: Project) => {
     setTab("overview")
@@ -62,7 +77,7 @@ export function HomeView() {
           <p className="mt-2 text-lead text-fg-2">{t("Your gaming space, all in one place.")}</p>
         </header>
 
-        {!screenshot && <WelcomeDialog open={welcomeOpen} initialName={nickname} onSaved={(name) => { setNickname(name); completeWelcome() }} onSkip={() => { finishWelcome(); completeWelcome() }} />}
+        {!screenshot && <WelcomeDialog open={welcomeOpen} initialName={nickname} onSaved={(name) => { setNickname(name); completeWelcome() }} onSkip={() => { finishWelcome(); completeWelcome() }} onDiscord={() => void beginDiscordLogin().catch((error) => toast.error(discordErrorMessage(error)))} />}
 
         {selected ? (
           <section className="relative isolate min-h-[250px] overflow-hidden rounded-2xl border border-line bg-fill-1">
@@ -145,9 +160,11 @@ export function HomeView() {
   )
 }
 
-function WelcomeDialog({ open, initialName, onSaved, onSkip }: { open: boolean; initialName: string; onSaved(name: string): void; onSkip(): void }) {
+function WelcomeDialog({ open, initialName, onSaved, onSkip, onDiscord }: { open: boolean; initialName: string; onSaved(name: string): void; onSkip(): void; onDiscord(): void }) {
   const [name, setName] = useState(initialName)
-  const [discordNotice, setDiscordNotice] = useState(false)
+  useEffect(() => {
+    if (open) setName(initialName)
+  }, [initialName, open])
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const next = name.trim().slice(0, 32)
@@ -161,8 +178,7 @@ function WelcomeDialog({ open, initialName, onSaved, onSkip }: { open: boolean; 
         <Button type="submit" className="w-full" disabled={!name.trim()}>{t("Continue with this name")}</Button>
       </form>
       <div className="relative my-4 text-center text-caption text-fg-4"><span className="bg-glass-solid px-2">{t("or")}</span><span className="absolute inset-x-0 top-1/2 -z-10 border-t border-line" /></div>
-      <Button type="button" variant="secondary" className="w-full" onClick={() => setDiscordNotice(true)}>{t("Continue with Discord")}</Button>
-      {discordNotice && <p role="status" className="mt-2 text-caption text-fg-3">{t("Discord sign-in needs an OAuth app and callback configured for this launcher. You can set a nickname or skip for now.")}</p>}
+      <Button type="button" variant="secondary" className="w-full" onClick={onDiscord}>{t("Continue with Discord")}</Button>
       <Button type="button" variant="ghost" className="mt-2 w-full" onClick={onSkip}>{t("Skip for now")}</Button>
       <p className="pt-3 pb-5 text-center text-caption text-fg-4">{t("Your nickname is stored only on this device.")}</p>
     </Dialog>

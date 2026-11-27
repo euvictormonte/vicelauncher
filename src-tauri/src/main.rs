@@ -11,6 +11,7 @@ mod brand;
 mod build_activity;
 mod build_zip;
 mod diagnose;
+mod discord;
 mod fullscreen;
 mod job_log;
 mod launcher;
@@ -74,6 +75,11 @@ fn act(
 #[tauri::command]
 fn log(from: usize, state: tauri::State<'_, Shared>) -> launcher::LogView {
     state.app.lock().unwrap().log_from(from)
+}
+
+#[tauri::command]
+fn begin_discord_login(handle: tauri::AppHandle) -> Result<String, String> {
+    discord::begin(handle)
 }
 
 fn main() {
@@ -161,7 +167,12 @@ fn main() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![snapshot, act, log])
+        .invoke_handler(tauri::generate_handler![
+            snapshot,
+            act,
+            log,
+            begin_discord_login
+        ])
         .run(tauri::generate_context!())
         .expect("Neves Launcher could not start");
 }

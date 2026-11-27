@@ -82,6 +82,8 @@ jobs:
           "VILAUNCHER_SIGN_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
       - name: Build the launcher and installer
+        env:
+          NEVES_DISCORD_CLIENT_ID: ${{ vars.NEVES_DISCORD_CLIENT_ID }}
         run: pnpm tauri build
 
       - name: Print the SHA-256 digests

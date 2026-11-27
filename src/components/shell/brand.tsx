@@ -18,7 +18,7 @@ export function Brand() {
   return (
     <div className="flex items-center gap-2">
       <img
-        src="/logo.svg"
+        src="/logo.png"
         alt=""
         onClick={onLogo}
         className="size-6 rounded-[6px] [-webkit-app-region:no-drag]"

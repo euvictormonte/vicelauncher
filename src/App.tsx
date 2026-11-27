@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Toaster } from "sonner"
+import { toast, Toaster } from "sonner"
 import { Sidebar } from "@/components/shell/sidebar"
 import { WindowControls } from "@/components/shell/window-controls"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -9,7 +9,9 @@ import { HomeSkeleton, HomeView } from "@/features/home/home-view"
 import { SettingsView } from "@/features/settings/settings-view"
 import { getBackend } from "@/lib/api"
 import { scheduleRefresh, useStore } from "@/lib/store"
-import { useLanguage } from "@/lib/i18n"
+import { t, useLanguage } from "@/lib/i18n"
+import { discordErrorMessage, inTauri } from "@/lib/api"
+import { saveNickname } from "@/lib/profile"
 
 export function App() {
   useLanguage()
@@ -17,11 +19,25 @@ export function App() {
   const view = useStore((s) => s.view)
   useEffect(() => {
     let off: (() => void) | undefined
+    let offDiscordConnected: (() => void) | undefined
+    let offDiscordError: (() => void) | undefined
     void getBackend().then(async (b) => {
       off = await b.onChange(scheduleRefresh)
       scheduleRefresh()
     })
-    return () => off?.()
+    if (inTauri) {
+      void import("@tauri-apps/api/event").then(async ({ listen }) => {
+        offDiscordConnected = await listen<string>("discord://connected", ({ payload }) => {
+          if (typeof payload !== "string" || !payload.trim()) return
+          saveNickname(payload)
+          toast.success(t("Discord connected. Welcome, {name}!", { name: payload }))
+        })
+        offDiscordError = await listen<string>("discord://error", ({ payload }) => {
+          toast.error(discordErrorMessage(payload))
+        })
+      })
+    }
+    return () => { off?.(); offDiscordConnected?.(); offDiscordError?.() }
   }, [])
   return (
     <TooltipProvider>
