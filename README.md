@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Neves Launcher" width="960">
+  <img src="assets/bannr.png" alt="Neves Launcher" width="960">
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img alt="License: GPL-3.0-or-later" src="https://img.shields.io/badge/license-GPL--3.0--or--later-ff4fa8"></a>
+  <a href="LICENSE"><img alt="License: GPL-3.0-or-later" src=""></a>
   <a href="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml"><img alt="Build" src="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml/badge.svg"></a>
   <a href="https://github.com/euvictormonte/vicelauncher/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/euvictormonte/vicelauncher?color=ff4fa8&cacheSeconds=300"></a>
 </p>
