@@ -110,7 +110,7 @@ function Presets({ project: p }: { project: Project }) {
         {choices.length > 0 ? (
           <Select label="Preset" value={value || choices[0].value} options={choices} onChange={setPicked} />
         ) : (
-          <span className="text-secondary text-fg-3">{t("No saved presets")}</span>
+          <span className="text-secondary text-fg-3">{translate("No saved presets")}</span>
         )}
         <Button size="sm" variant="secondary" disabled={choices.length === 0} onClick={() => void run<string>({ type: "apply_preset", repo: p.repo, name: selectedName ?? (value ? null : choices[0]?.value ?? null) }).then((n) => n && toast.success(translate("Applied “{name}”", { name: n })))}>
           Apply

@@ -144,7 +144,7 @@ export function SettingsView() {
 
         <Group title="Updates">
           <Row
-            label={u.state === "available" ? t("{version} is available", { version: u.tag }) : u.state === "downloaded" ? "The update is ready" : u.state === "checking" ? "Checking for updates…" : u.state === "downloading" ? "Downloading and verifying…" : u.state === "failed" ? "The update check failed" : "You're up to date"}
+            label={u.state === "available" ? t("{version} is available", { version: u.tag ?? snap.version }) : u.state === "downloaded" ? "The update is ready" : u.state === "checking" ? "Checking for updates…" : u.state === "downloading" ? "Downloading and verifying…" : u.state === "failed" ? "The update check failed" : "You're up to date"}
             hint={u.restart_error ?? u.error ?? t("Version {version}", { version: snap.version })}
           >
             {u.state === "available" && <Button size="sm" variant="primary" disabled={busy} onClick={() => void run({ type: "download_update" })}>Update and restart</Button>}
@@ -229,8 +229,8 @@ function DiskSpace() {
       description="What Neves Launcher keeps on this PC. Saves are always kept. Clearing a shader cache makes its next Play slow again while it is rebuilt."
     >
       <Row
-        label={view ? t("{size} in use", { size: formatBytes(view.total_bytes) }) : t("Measuring…")}
-        hint={view && `${t("{size} outside the projects (checkpoints, logs)", { size: formatBytes(view.other_bytes) })}${view.free_bytes != null ? `. ${formatBytes(view.free_bytes)} ${t("free on the drive")}` : ""}.`}
+        label={view ? translate("{size} in use", { size: formatBytes(view.total_bytes) }) : translate("Measuring…")}
+        hint={view && `${translate("{size} outside the projects (checkpoints, logs)", { size: formatBytes(view.other_bytes) })}${view.free_bytes != null ? `. ${formatBytes(view.free_bytes)} ${translate("free on the drive")}` : ""}.`}
       >
         <Button size="sm" variant="ghost" disabled={scanning} onClick={() => void scan()}>
           {scanning ? <Spinner /> : <RefreshCw />} Refresh
