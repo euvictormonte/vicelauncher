@@ -2,7 +2,7 @@
 // Signs one Windows binary with signtool, for Tauri's bundle > windows > signCommand.
 // Tauri calls it with the file to sign as the only argument (`%1` in tauri.conf.json).
 //
-// Signing is optional on purpose: without VILAUNCHER_SIGN_THUMBPRINT the build still
+// Signing is optional on purpose: without NEVES_LAUNCHER_SIGN_THUMBPRINT the build still
 // succeeds and ships unsigned, exactly as before. Traps (Trapmine and friends) flag
 // fresh unsigned binaries, so releases should be signed. See docs/FALSE-POSITIVES.md.
 import { spawnSync } from "node:child_process";
@@ -20,13 +20,17 @@ if (!existsSync(file)) {
   process.exit(1);
 }
 
-const thumbprint = (process.env.VILAUNCHER_SIGN_THUMBPRINT ?? "").replace(/\s/g, "");
+const thumbprint = (
+  process.env.NEVES_LAUNCHER_SIGN_THUMBPRINT ??
+  process.env.VILAUNCHER_SIGN_THUMBPRINT ??
+  ""
+).replace(/\s/g, "");
 if (!thumbprint) {
   console.log(`sign-windows: no certificate configured, ${file} stays unsigned`);
   process.exit(0);
 }
 
-const timestamp = process.env.VILAUNCHER_TIMESTAMP_URL || "http://timestamp.digicert.com";
+const timestamp = process.env.NEVES_LAUNCHER_TIMESTAMP_URL || process.env.VILAUNCHER_TIMESTAMP_URL || "http://timestamp.digicert.com";
 const signtool = findSigntool();
 if (!signtool) {
   console.error(

@@ -1,6 +1,6 @@
 # Code of Conduct
 
-VILauncher is a community project. We want people to be able to ask, build, disagree and help without fear of abuse.
+Neves Launcher is a community project. We want people to be able to ask, build, disagree and help without fear of abuse.
 
 ## Expected
 
@@ -14,7 +14,7 @@ VILauncher is a community project. We want people to be able to ask, build, disa
 - Harassment, insults, threats or discrimination, in issues, pull requests, chat or anywhere else around the project.
 - Posting someone else's private data, or game files or copyrighted material that is not yours to share.
 - Asking for, or sharing, ways to break someone else's systems or accounts.
-- Presenting a fork or a copy as the official VILauncher, or as affiliated with VIPortLive, Mandyhub, Rockstar Games or Take-Two.
+- Presenting a fork or a copy as the official Neves Launcher, or as affiliated with VIPortLive, Mandyhub, Rockstar Games or Take-Two.
 
 ## Enforcement
 

@@ -4,8 +4,8 @@
 
 use serde::Serialize;
 
-/// Where VILauncher's own problems are reported.
-pub(crate) const LAUNCHER_REPO: &str = "dazacode/vilauncher";
+/// Where Neves Launcher's own problems are reported.
+pub(crate) const LAUNCHER_REPO: &str = "euvictormonte/vilauncher";
 /// The longest body put in the link; GitHub refuses links that are too long.
 const LINK_BODY_LIMIT: usize = 6000;
 /// The last lines of the log that go in the report.
@@ -101,7 +101,7 @@ pub(crate) fn make(f: &Facts) -> Report {
         .unwrap_or_else(|| "not found".to_string());
     let text = format!(
         "## What happened\n<!-- What did you do, and what did you expect? -->\n\n\
-         ## Launcher\n- VILauncher {}\n- CPU: {cpu}\n- GPU: {gpus}\n- Memory: {ram}\n\n\
+         ## Launcher\n- Neves Launcher {}\n- CPU: {cpu}\n- GPU: {gpus}\n- Memory: {ram}\n\n\
          ## Project\n- {} (`{}`)\n- Last stage: {stage}\n\n\
          ## Log (last {} lines)\n```text\n{}\n```\n",
         env!("CARGO_PKG_VERSION"),
@@ -162,7 +162,7 @@ mod tests {
         let report = make(&facts(&log, "owner/victory"));
         assert!(report
             .launcher_url
-            .starts_with("https://github.com/dazacode/vilauncher/issues/new?"));
+            .starts_with("https://github.com/euvictormonte/vilauncher/issues/new?"));
         assert!(report
             .build_url
             .as_deref()

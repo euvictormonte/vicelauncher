@@ -11,7 +11,7 @@ const LATER = "vilauncher.launcher-update-later"
 const ANNOUNCED = "vilauncher.launcher-update-announced"
 
 /**
- * A new release of VILauncher itself: a card in the sidebar while it is available, downloading or
+ * A new release of Neves Launcher itself: a card in the sidebar while it is available, downloading or
  * ready, and one notice when it first appears. Nothing installs until the player presses Update.
  */
 export function LauncherUpdate() {
@@ -22,7 +22,7 @@ export function LauncherUpdate() {
     if (!u || u.state !== "available" || !u.tag) return
     if (localStorage.getItem(ANNOUNCED) === u.tag) return
     localStorage.setItem(ANNOUNCED, u.tag)
-    toast(`VILauncher ${u.tag} is out`, {
+    toast(`Neves Launcher ${u.tag} is out`, {
       description: "Update now, or later from the sidebar.",
       duration: 12000,
       action: { label: "Update", onClick: () => void run({ type: "download_update" }) },
@@ -35,7 +35,7 @@ export function LauncherUpdate() {
     if (localStorage.getItem(LATER) === tag) return null
     return (
       <Card>
-        <p className="text-caption text-fg-2">VILauncher {tag} is out</p>
+        <p className="text-caption text-fg-2">Neves Launcher {tag} is out</p>
         <div className="mt-2 flex flex-wrap gap-1.5">
           <Button size="sm" variant="primary" onClick={() => void run({ type: "download_update" })}>Update</Button>
           <Button

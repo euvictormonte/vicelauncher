@@ -78,13 +78,13 @@ function snapshot(): Snapshot {
   return {
     version: "0.1.0",
     notice_accepted: state.notice,
-    brand: { name: "VILauncher", team: "VIPortLive team", site: "https://viportlive.com", site_label: "viportlive.com", source: "https://github.com/dazacode/vilauncher" },
+    brand: { name: "Neves Launcher", team: "Neves Launcher team", site: "https://viportlive.com", site_label: "viportlive.com", source: "https://github.com/euvictormonte/vilauncher" },
     list: { status: "ready", error: null, items: SAMPLE.map(project) },
     custom: [],
     selected: state.selected,
     settings: {
       game_dir: state.gameDir,
-      workspace: "C:\\Users\\you\\AppData\\Local\\VILauncher",
+      workspace: "C:\\Users\\you\\AppData\\Local\\Neves Launcher",
       install_dir_custom: false,
       warm_before_play: state.warm,
       warm_pipelines: false,
@@ -97,7 +97,7 @@ function snapshot(): Snapshot {
       list_tier: state.listTier ?? 0,
       spec_ram_gb: state.specRam ?? null,
       spec_vram_gb: state.specVram ?? null,
-      backgrounds_dir: "C:\\Users\\you\\AppData\\Local\\VILauncher\\backgrounds",
+      backgrounds_dir: "C:\\Users\\you\\AppData\\Local\\Neves Launcher\\backgrounds",
       skip_update_warning: state.skipUpdateWarning,
       agent_access: state.agentAccess,
       acknowledged: state.acknowledged,
@@ -113,7 +113,7 @@ function snapshot(): Snapshot {
       log_lines: state.log.length,
       import_error: null,
     },
-    updater: { state: "current", tag: null, error: null, restart_error: null, releases: "https://github.com/dazacode/vilauncher/releases" },
+    updater: { state: "current", tag: null, error: null, restart_error: null, releases: "https://github.com/euvictormonte/vilauncher/releases" },
     pending_move: null,
     presets: [],
     backgrounds: [],
@@ -146,7 +146,7 @@ async function act(a: Action): Promise<unknown> {
       return {
         title: `${a.repo}: mock report`,
         text: "## What happened\n\n## Log (mock)\n",
-        launcher_url: "https://github.com/dazacode/vilauncher/issues/new",
+        launcher_url: "https://github.com/euvictormonte/vilauncher/issues/new",
         build_url: a.repo.split("/").length === 2 ? `https://github.com/${a.repo}/issues/new` : null,
       }
     case "install_tools":

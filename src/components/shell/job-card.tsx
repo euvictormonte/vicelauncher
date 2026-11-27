@@ -20,7 +20,7 @@ export function JobCard() {
   }, [job?.running])
   const show = !!job && !!job.stage && dismissed !== key && job.stage !== "Playing"
   const project = snap && job?.repo ? allProjects(snap).find((p) => p.repo === job.repo) : undefined
-  const title = project ? alias(project).name : "VILauncher"
+  const title = project ? alias(project).name : "Neves Launcher"
   return (
     <AnimatePresence initial={false}>
       {show && job && (

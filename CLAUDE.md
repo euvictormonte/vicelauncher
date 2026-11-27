@@ -1,4 +1,4 @@
-# VILauncher: notes for agents
+# Neves Launcher: notes for agents
 
 ## Checking a build
 
@@ -22,13 +22,13 @@ The tree often has other people's uncommitted edits. Do not revert or reformat f
 
 ## For AI agents
 
-`node scripts/vilauncher-agent.mjs <command> [--json]` (or `pnpm agent`) is the only tool to use on the launcher's projects. Run `help` for the list.
+`node scripts/neves-launcher-agent.mjs <command> [--json]` (or `pnpm agent`) is the only tool to use on the launcher's projects. Run `help` for the list.
 
 - Read-only, always allowed: `status` (folders, agent access, tools, disk, projects, builds), `projects`, `log <repo>`, `patch-status <repo>`, `patch-export <repo> --out <file>` (writes only the new file, never overwrites).
-- Changing: `fix <repo> --yes` (runs the launcher's Fix and verify) and `patch-apply <repo> <file> --yes` (git apply to the working tree, never commits). Both need the player's **AI agent access** setting on (`agent_access: true` in `%APPDATA%\VILauncher\settings.json`; missing means off). Without it they exit 1 and change nothing.
+- Changing: `fix <repo> --yes` (runs the launcher's Fix and verify) and `patch-apply <repo> <file> --yes` (git apply to the working tree, never commits). Both need the player's **AI agent access** setting on (`agent_access: true` in `%APPDATA%\Neves Launcher\settings.json`; missing means off). Without it they exit 1 and change nothing.
 - Flow: `status` -> `log <repo>` -> make the change on a branch in `repos\<slug>` -> `patch-export <repo> --out <file>` -> `patch-apply <repo> <file> --yes` -> `fix <repo> --yes` -> `status` again.
 - Exit codes: 0 ok, 1 refused, 2 usage error, 3 failure. Errors go to stderr.
 - Changes run on the player's PC and are their responsibility. Show the patch to the player before `fix`.
-- `fix` refuses while VILauncher.exe runs (ask the player to close it). It runs the launcher's `--fix <repo>` command from `src-tauri\target\release\VILauncher.exe` if that exists, else the debug build. The launcher's `--fix` refuses too (exit 1) unless `agent_access` is true and no other VILauncher window runs. Build it with `cargo build --release` in `src-tauri`.
+- `fix` refuses while Neves Launcher.exe runs (ask the player to close it). It runs the launcher's `--fix <repo>` command from `src-tauri\target\release\Neves Launcher.exe` if that exists, else the debug build. The launcher's `--fix` refuses too (exit 1) unless `agent_access` is true and no other Neves Launcher window runs. Build it with `pnpm tauri build`.
 - The tool never reads or writes `data\` (the saves). It prints no secrets, env values or home-folder paths.
 - When a job (Install, Update, Play, Fix and verify) ends, the launcher writes its output to `<workspace>\logs\<slug>.log` (header line with the time and stage, then the last 2000 lines, overwritten by each job, scrubbed of the player's name and folders). `log <repo>` prints that file, or says none exists yet. Never `data\`.

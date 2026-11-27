@@ -24,7 +24,7 @@ export function useUpdateWarning(repo: string) {
       open={open}
       onOpenChange={setOpen}
       title="Update this project?"
-      description="Updating replaces this build. The previous build is kept, so you can restore it once, but the project's source is replaced. Uncommitted changes in the project folder are saved as a patch file in VILauncher's patches folder before the update. The build takes several minutes. Your saves are not touched."
+      description="Updating replaces this build. The previous build is kept, so you can restore it once, but the project's source is replaced. Uncommitted changes in the project folder are saved as a patch file in Neves Launcher's patches folder before the update. The build takes several minutes. Your saves are not touched."
       footer={
         <>
           <Button variant="primary" onClick={() => void update()}>

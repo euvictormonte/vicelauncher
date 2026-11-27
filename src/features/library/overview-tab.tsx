@@ -32,7 +32,7 @@ export function OverviewTab({ project: p }: { project: Project }) {
         {p.custom && p.kind === "git" && (
           <div className="flex items-start gap-3 rounded-lg border border-line bg-fill-1 px-4 py-3">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
-            <p className="text-body text-fg-2">You added this repo by link. VILauncher downloads, builds and runs its code on your PC, so keep only repos from people you trust.</p>
+            <p className="text-body text-fg-2">You added this repo by link. Neves Launcher downloads, builds and runs its code on your PC, so keep only repos from people you trust.</p>
           </div>
         )}
         <section>

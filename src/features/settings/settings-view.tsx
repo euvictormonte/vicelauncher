@@ -58,7 +58,7 @@ export function SettingsView() {
           <p className="text-body text-fg-3">The other settings are hidden in Screenshot mode.</p>
         ) : (
           <>
-            <Group title="Game files" description="The folder with game_scarlett_master.exe from your own copy of the game. VILauncher never downloads game files.">
+            <Group title="Game files" description="The folder with game_scarlett_master.exe from your own copy of the game. Neves Launcher never downloads game files.">
               <Row stacked label="Folder">
                 <Input value={gameDir} onChange={(e) => setGameDir(e.target.value)} placeholder="Paste the folder's path" className="font-mono text-secondary" aria-label="Game folder" />
                 <Button size="md" onClick={async () => { const d = await pickFolder("The folder with your game files"); if (d) void run({ type: "set_game_dir", path: d }) }}>
@@ -157,10 +157,10 @@ export function SettingsView() {
           <Row label={`${snap.brand.name} by the ${snap.brand.team}`} hint="The library comes from VIPortLive, built on PortWatch's tracker. The projects are their authors' work, built on VIctory by Marvisak and its contributors.">
             <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.site)}><ExternalLink /> {snap.brand.site_label}</Button>
           </Row>
-          <Row label="Based on Mandyhub by Zettrox" hint="Free software under the GNU General Public License v3 or later. Redesign of the original by ellion369; save picker, checkpoints, presets and build tracking by TheGameOnAddict.">
-            <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.source)}><ExternalLink /> Source code</Button>
+          <Row label="Forked from VILauncher" hint="VILauncher is based on Mandyhub by Zettrox. Free software under the GNU General Public License v3 or later. Redesign by ellion369; save picker, checkpoints, presets and build tracking by TheGameOnAddict.">
+            <Button size="sm" variant="ghost" onClick={() => void openUrl(snap.brand.source)}><ExternalLink /> Upstream source</Button>
           </Row>
-          <Row label="Legal notice" hint="You provide your own copy of the game, and you are responsible for what you install, build and run. VILauncher only manages the projects.">
+          <Row label="Legal notice" hint="You provide your own copy of the game, and you are responsible for what you install, build and run. Neves Launcher only manages the projects.">
             <Button size="sm" variant="ghost" onClick={() => useStore.getState().open({ kind: "notice" })}>Read</Button>
           </Row>
         </Group>
@@ -217,7 +217,7 @@ function DiskSpace() {
   return (
     <Group
       title="Disk space"
-      description="What VILauncher keeps on this PC. Saves are always kept. Clearing a shader cache makes its next Play slow again while it is rebuilt."
+      description="What Neves Launcher keeps on this PC. Saves are always kept. Clearing a shader cache makes its next Play slow again while it is rebuilt."
     >
       <Row
         label={view ? `${formatBytes(view.total_bytes)} in use` : "Measuring…"}

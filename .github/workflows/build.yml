@@ -85,19 +85,19 @@ jobs:
         run: pnpm tauri build
 
       - name: Print the SHA-256 digests
-        run: sha256sum src-tauri/target/release/VILauncher.exe src-tauri/target/release/bundle/nsis/*.exe
+        run: sha256sum "src-tauri/target/release/Neves Launcher.exe" src-tauri/target/release/bundle/nsis/*.exe
 
-      - name: Upload VILauncher.exe
+      - name: Upload Neves Launcher.exe
         uses: actions/upload-artifact@v4
         with:
-          name: VILauncher.exe
-          path: src-tauri/target/release/VILauncher.exe
+          name: Neves Launcher.exe
+          path: src-tauri/target/release/Neves Launcher.exe
           if-no-files-found: error
 
       - name: Upload the installer
         uses: actions/upload-artifact@v4
         with:
-          name: VILauncher-setup
+          name: Neves Launcher-setup
           path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
 
@@ -111,21 +111,21 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: VILauncher.exe
+          name: Neves Launcher.exe
           path: release/exe
 
       - uses: actions/download-artifact@v4
         with:
-          name: VILauncher-setup
+          name: Neves Launcher-setup
           path: release/installer
 
-      # The in-app updater looks for an asset named exactly VILauncher.exe and
+      # The in-app updater looks for an asset named exactly Neves Launcher.exe and
       # checks it against the sha256 digest GitHub records for the upload.
       - uses: softprops/action-gh-release@v2
         with:
-          name: VILauncher ${{ github.ref_name }}
+          name: Neves Launcher ${{ github.ref_name }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            release/exe/VILauncher.exe
+            release/exe/Neves Launcher.exe
             release/installer/*.exe

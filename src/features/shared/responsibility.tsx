@@ -15,12 +15,12 @@ interface Text {
 const TEXT: Record<ResponsibilityId, Text> = {
   "import-repo": {
     title: "Before you import this project",
-    body: "Importing a repo downloads its code and runs it on this PC. Its build scripts and the programs it builds can read and change files you can access, use the network, and use your graphics card. VILauncher checks the repo's game files and verified project list but cannot make unknown code safe. Only import repos you trust, and read the code if you can.",
+    body: "Importing a repo downloads its code and runs it on this PC. Its build scripts and the programs it builds can read and change files you can access, use the network, and use your graphics card. Neves Launcher checks the repo's game files and verified project list but cannot make unknown code safe. Only import repos you trust, and read the code if you can.",
     bullets: [
       "It runs build scripts and compiles the code.",
       "It may download more code and tools.",
       "It can write to folders your user account can write to.",
-      "The saves VILauncher keeps are separate and an import does not touch them, but the project's own code might.",
+      "The saves Neves Launcher keeps are separate and an import does not touch them, but the project's own code might.",
     ],
   },
   "agent-access": {

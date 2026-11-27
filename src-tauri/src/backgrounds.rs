@@ -1,5 +1,5 @@
 //! The player's own pictures behind each project's page: jpg or png files in
-//! `%LOCALAPPDATA%\VILauncher\backgrounds` (the old Mandyhub folder's are
+//! `%LOCALAPPDATA%\Neves Launcher\backgrounds` (the old Mandyhub folder's are
 //! used while this one is empty). None ship with the launcher.
 
 use std::path::{Path, PathBuf};

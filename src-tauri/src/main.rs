@@ -1,4 +1,4 @@
-//! VILauncher by the VIPortLive team: a community launcher for VIctory-based
+//! Neves Launcher: a community launcher for VIctory-based
 //! projects that run an Xbox Series game on PC. Forked from Mandyhub by
 //! Zettrox. This is the window: a Tauri shell around the web UI in ../src,
 //! with the launcher (src/launcher.rs) behind three commands.
@@ -77,7 +77,7 @@ fn log(from: usize, state: tauri::State<'_, Shared>) -> launcher::LogView {
 }
 
 fn main() {
-    // Fix and verify without a window, for the agent tool (scripts\vilauncher-agent.mjs fix):
+    // Fix and verify without a window, for the agent tool (scripts\neves-launcher-agent.mjs fix):
     // `--fix <repo>` prints the job's log and a STAGE line. Debug and release builds alike.
     // It refuses (exit 1) unless AI agent access is on, and while another launcher window runs.
     if let Some(at) = std::env::args().position(|a| a == "--fix") {
@@ -163,36 +163,36 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![snapshot, act, log])
         .run(tauri::generate_context!())
-        .expect("VILauncher could not start");
+        .expect("Neves Launcher could not start");
 }
 
 /// Why `--fix` may not run now, or `Ok` when it may: AI agent access must be on in
-/// settings.json, and no other VILauncher.exe (the window) may be running.
+/// settings.json, and no other Neves Launcher.exe (the window) may be running.
 fn fix_allowed() -> Result<(), String> {
     let text = std::fs::read_to_string(settings_store::file()).unwrap_or_default();
     let settings: serde_json::Value =
         serde_json::from_str(&text).unwrap_or(serde_json::Value::Null);
     if settings.get("agent_access") != Some(&serde_json::Value::Bool(true)) {
-        return Err("AI agent access is off. Ask the player to turn on 'AI agent access' in VILauncher Settings. Nothing was changed.".into());
+        return Err("AI agent access is off. Ask the player to turn on 'AI agent access' in Neves Launcher Settings. Nothing was changed.".into());
     }
     if other_launcher_running()? {
         return Err(
-            "VILauncher is running. Close it first: Fix may need the files it holds.".into(),
+            "Neves Launcher is running. Close it first: Fix may need the files it holds.".into(),
         );
     }
     Ok(())
 }
 
-/// Whether a VILauncher.exe other than this process runs (checked with tasklist, CSV: "name","pid",...).
+/// Whether a Neves Launcher.exe other than this process runs (checked with tasklist, CSV: "name","pid",...).
 fn other_launcher_running() -> Result<bool, String> {
     let mut command = std::process::Command::new("tasklist");
-    command.args(["/FI", "IMAGENAME eq VILauncher.exe", "/FO", "CSV", "/NH"]);
+    command.args(["/FI", "IMAGENAME eq Neves Launcher.exe", "/FO", "CSV", "/NH"]);
     hide_window(&mut command);
     let output = command
         .output()
-        .map_err(|_| "could not check whether VILauncher is running (tasklist failed), so Fix was not started".to_string())?;
+        .map_err(|_| "could not check whether Neves Launcher is running (tasklist failed), so Fix was not started".to_string())?;
     if !output.status.success() {
-        return Err("could not check whether VILauncher is running (tasklist failed), so Fix was not started".into());
+        return Err("could not check whether Neves Launcher is running (tasklist failed), so Fix was not started".into());
     }
     let me = std::process::id();
     let text = String::from_utf8_lossy(&output.stdout);

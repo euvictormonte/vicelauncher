@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use crate::brand::{RELEASE_ASSET as ASSET, REPOSITORY};
 
-pub const RELEASES: &str = "https://github.com/dazacode/vilauncher/releases";
+pub const RELEASES: &str = "https://github.com/euvictormonte/vilauncher/releases";
 const MAX_BYTES: u64 = 64 * 1024 * 1024;
 
 #[derive(Deserialize)]
@@ -132,7 +132,9 @@ fn check_release() -> Result<State, String> {
     let available =
         version(&release.tag_name).ok_or("The release tag is not a supported version.")?;
     let current = version(env!("CARGO_PKG_VERSION")).ok_or("The installed version is invalid.")?;
-    if available > current {
+    // A fork must not offer an upstream release that does not ship its own executable.
+    let has_launcher = release.assets.iter().any(|asset| asset.name == ASSET);
+    if available > current && has_launcher {
         Ok(State::Available(release))
     } else {
         Ok(State::Current)
@@ -187,8 +189,8 @@ fn download_release(release: &Release) -> Result<DownloadedUpdate, String> {
 
 pub fn restart_with(update: &DownloadedUpdate) -> Result<(), String> {
     let executable = std::env::current_exe().map_err(|error| error.to_string())?;
-    let staged = executable.with_extension(format!("vilauncher-{}.tmp", std::process::id()));
-    let backup = executable.with_extension("vilauncher-previous.exe");
+    let staged = executable.with_extension(format!("neves-launcher-{}.tmp", std::process::id()));
+    let backup = executable.with_extension("neves-launcher-previous.exe");
     let source = fs::File::open(&update.path)
         .map_err(|error| format!("Could not open the downloaded update: {error}"))?;
     let mut bytes = Vec::new();
@@ -206,7 +208,7 @@ pub fn restart_with(update: &DownloadedUpdate) -> Result<(), String> {
         .write(true)
         .create_new(true)
         .open(&staged)
-        .map_err(|error| format!("Could not stage the update beside VILauncher: {error}"))?;
+        .map_err(|error| format!("Could not stage the update beside Neves Launcher: {error}"))?;
     let write_result = file.write_all(&bytes).and_then(|_| file.sync_all());
     drop(file);
     let result = (|| -> Result<(), String> {

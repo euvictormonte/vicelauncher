@@ -1,8 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "VILauncher",
-  "version": "1.0.2",
-  "identifier": "com.viportlive.vilauncher",
+  "productName": "Neves Launcher",
+  "mainBinaryName": "Neves Launcher",
+  "version": "1.0.3",
+  "identifier": "com.neveslauncher.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "VILauncher",
+        "title": "Neves Launcher",
         "width": 1360,
         "height": 860,
         "minWidth": 1024,
@@ -30,6 +31,7 @@
         "enable": true,
         "scope": [
           "$LOCALDATA/VILauncher/backgrounds/**",
+          "$LOCALDATA/Neves Launcher/backgrounds/**",
           "$LOCALDATA/Mandyhub/backgrounds/**",
           "$LOCALDATA/VI Launcher/backgrounds/**",
           "$DATA/VILauncher/backgrounds/**"
@@ -49,9 +51,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "publisher": "VIPortLive team",
+    "publisher": "Neves Launcher",
     "copyright": "GPL-3.0-or-later. Based on Mandyhub by Zettrox.",
-    "shortDescription": "A community launcher for VIctory-based projects",
+    "shortDescription": "A launcher for community projects",
     "windows": {
       "webviewInstallMode": {
         "type": "downloadBootstrapper"

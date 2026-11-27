@@ -23,7 +23,7 @@ export function LibraryView() {
       <div className="relative flex h-full flex-col justify-end px-10 pb-16">
         <h1 className="font-display text-page font-bold text-fg">The project list didn't arrive</h1>
         <p className="mt-2 max-w-[520px] text-lead text-fg-2">
-          VILauncher reads the list of community builds from viportlive.com. Check your connection, then try again.
+          Neves Launcher reads the list of community builds from viportlive.com. Check your connection, then try again.
         </p>
         <div className="mt-6">
           <Button onClick={() => void run({ type: "refresh_projects" })}>Try again</Button>

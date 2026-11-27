@@ -808,7 +808,7 @@ fn search_drives() -> Result<String, String> {
     Err("The game was not found on any drive. Choose its folder with Browse.".into())
 }
 
-/// Where the launcher keeps repos it downloads: `%LOCALAPPDATA%\VILauncher` unless moved.
+/// Where the launcher keeps repos it downloads: `%LOCALAPPDATA%\Neves Launcher` unless moved.
 fn workspace() -> PathBuf {
     INSTALL_DIR
         .lock()
@@ -817,7 +817,7 @@ fn workspace() -> PathBuf {
         .unwrap_or_else(default_workspace)
 }
 
-/// `%LOCALAPPDATA%\VILauncher`: where projects go unless the player chose
+/// `%LOCALAPPDATA%\Neves Launcher`: where projects go unless the player chose
 /// another folder (Settings: Install folder).
 pub(crate) fn default_workspace() -> PathBuf {
     brand::local_base().join(brand::FOLDER)
@@ -878,7 +878,7 @@ fn copy_dir(from: &Path, to: &Path, log: &dyn Fn(String)) -> std::io::Result<()>
     Ok(())
 }
 
-/// The launcher had other names before (Mandyhub, VI Launcher). On the first
+/// The launcher had other names before (VILauncher, Mandyhub, VI Launcher). On the first
 /// start, the newest of their settings folders is copied, not moved, so the
 /// old launcher keeps working beside this one. Projects are not copied: see
 /// `legacy_workspace`.
@@ -1781,7 +1781,7 @@ fn rollback(job: &Arc<Mutex<Job>>, ctx: &Ctx, p: &Project) -> Result<(), String>
 
 fn uninstall(job: &Arc<Mutex<Job>>, ctx: &Ctx, p: &Project) -> Result<(), String> {
     if p.local_exe.is_some() {
-        return Err("this build was not installed by VILauncher".into());
+        return Err("this build was not installed by Neves Launcher".into());
     }
     stage(job, ctx, "Uninstalling");
     let ws = workspace();

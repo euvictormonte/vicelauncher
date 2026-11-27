@@ -36,7 +36,7 @@ function ReportBar({ project }: { project: Project }) {
             if (r) void openUrl(r.launcher_url)
           }}
         >
-          Report to VILauncher
+          Report to Neves Launcher
         </Button>
         {project.repo.split("/").length === 2 && !project.repo.includes("://") && (
           <Button
@@ -112,7 +112,7 @@ export function ActivityTab({ project }: { project: Project }) {
             variant="ghost"
             disabled={!lines.length}
             onClick={async () => {
-              const path = await saveFile("Export the activity log", "vilauncher.log", [{ name: "Log", extensions: ["log", "txt"] }])
+              const path = await saveFile("Export the activity log", "neves-launcher.log", [{ name: "Log", extensions: ["log", "txt"] }])
               if (path) void run({ type: "export_log", path }, "Log exported")
             }}
           >

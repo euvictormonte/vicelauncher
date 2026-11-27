@@ -1,22 +1,22 @@
 <p align="center">
-  <img src="assets/banner.png" alt="VILauncher by VIPortLive" width="960">
+  <img src="assets/banner.png" alt="Neves Launcher" width="960">
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License: GPL-3.0-or-later" src="https://img.shields.io/badge/license-GPL--3.0--or--later-ff4fa8"></a>
-  <a href="https://github.com/dazacode/vilauncher/actions/workflows/build.yml"><img alt="Build" src="https://github.com/dazacode/vilauncher/actions/workflows/build.yml/badge.svg"></a>
-  <a href="https://github.com/dazacode/vilauncher/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/dazacode/vilauncher?color=ff4fa8&cacheSeconds=300"></a>
+  <a href="https://github.com/dazacode/vilauncher/actions/workflows/build.yml"><img alt="Upstream build" src="https://github.com/dazacode/vilauncher/actions/workflows/build.yml/badge.svg"></a>
+  <a href="https://github.com/dazacode/vilauncher/releases/latest"><img alt="Upstream release" src="https://img.shields.io/github/v/release/dazacode/vilauncher?color=ff4fa8&cacheSeconds=300"></a>
 </p>
 
 A Windows launcher for community game projects. It lists projects from [VIPortLive](https://viportlive.com), downloads and builds them with Git and Cargo, and starts them with **your own copy of the game files**.
 
-![VILauncher library: recommended builds, filters and a project's overview](assets/screenshots/library.png)
+![Neves Launcher library: recommended builds, filters and a project's overview](assets/screenshots/library.png)
 
-> **No game is included.** VILauncher ships no game files, downloads none, and is not affiliated with Rockstar Games, Take-Two Interactive, or any other publisher. See [LEGAL.md](LEGAL.md).
+> **No game is included.** Neves Launcher ships no game files, downloads none, and is not affiliated with Rockstar Games, Take-Two Interactive, or any other publisher. See [LEGAL.md](LEGAL.md).
 
 ## Where it came from
 
-VILauncher is a fork of [Mandyhub](https://github.com/TheGameOnAddict/mandyhub-sinkfinger) by Zettrox, redesigned and extended by the VIPortLive team. It has grown well past what Mandyhub did:
+Neves Launcher is a fork of VILauncher, which began as a fork of [Mandyhub](https://github.com/TheGameOnAddict/mandyhub-sinkfinger) by Zettrox. The source project was redesigned and extended by the VIPortLive team; this fork is being rebranded as Neves Launcher.
 
 - Its project library is not limited to VIctory builds. Any Rust project with a Git URL, any prebuilt Windows ZIP, and any build already on your PC can be added and managed the same way.
 - It checks a project's own notes and reports for known problems, and can fix and verify many of them (see [Features](#features)).
@@ -29,22 +29,22 @@ Mandyhub's settings and installed projects are carried over on first start, so n
 **You can fork it, and we want you to.** The code is GPL-3.0-or-later. You may use, study, change and redistribute it, including as a base for your own launcher or to contribute back. The license requires that any copy or modified version you distribute:
 
 - stays under GPL-3.0-or-later and comes with its source code,
-- keeps the copyright and license notices and credits Mandyhub and VILauncher's authors,
+- keeps the copyright and license notices and credits Mandyhub and Neves Launcher's authors,
 - marks clearly what you changed.
 
 **You can't take it closed-source.** A modified version you distribute must be released under the same license. That is the rule the GPL sets, not a courtesy we are asking for.
 
-**The projects are not ours.** VILauncher manages projects made by other people. It does not review, certify or vouch for their code. Read what you run.
+**The projects are not ours.** Neves Launcher manages projects made by other people. It does not review, certify or vouch for their code. Read what you run.
 
-**Rockstar and GTA.** VILauncher shows community projects for a game whose files you must already own. It never includes, downloads or distributes game files. Rockstar Games and Take-Two Interactive are not affiliated with this project and have not endorsed it. Their names and marks belong to them.
+**Rockstar and GTA.** Neves Launcher shows community projects for a game whose files you must already own. It never includes, downloads or distributes game files. Rockstar Games and Take-Two Interactive are not affiliated with this project and have not endorsed it. Their names and marks belong to them.
 
 ## What's new
 
-The newest release, its notes and its downloads are always at [Releases](https://github.com/dazacode/vilauncher/releases/latest). The badges above update themselves: the release badge shows the newest version, and the build badge shows whether the `main` branch builds.
+The links and badges above point to the upstream VILauncher repository. Neves Launcher does not have its own release repository yet, so those builds and downloads are not Neves Launcher releases.
 
 ## Download
 
-Get `VILauncher.exe` (portable) or the installer from [Releases](https://github.com/dazacode/vilauncher/releases/latest). The launcher checks for its own updates at start and replaces itself after verifying the download's SHA-256 digest.
+There is no Neves Launcher release download yet. Build it from source using the steps below. The updater only accepts a release containing `Neves Launcher.exe`; the upstream VILauncher executable is not installed as an update.
 
 ### Antivirus flags
 
@@ -78,14 +78,14 @@ The screenshots use example data from the browser mock, not a real PC or account
 - Windows 10 or 11, 64-bit
 - WebView2, which ships with Windows 10 and 11 (the installer fetches it if missing)
 - Your own copy of any game a project needs
-- To build Rust projects: Git, Rust and the C++ build tools (VILauncher can install them)
+- To build Rust projects: Git, Rust and the C++ build tools (Neves Launcher can install them)
 
 ## Data folders
 
 | Path | Holds |
 | --- | --- |
-| `%LOCALAPPDATA%\VILauncher` | Repos, builds, shader caches, saves and profiles (`data`), previous builds, patches, logs. The install folder can be changed in Settings. |
-| `%APPDATA%\VILauncher\settings.json` | Settings |
+| `%LOCALAPPDATA%\Neves Launcher` | Repos, builds, shader caches, saves and profiles (`data`), previous builds, patches, logs. The install folder can be changed in Settings. |
+| `%APPDATA%\Neves Launcher\settings.json` | Settings |
 
 Saves live in `data` and are never touched by an update, a rollback or a cache clear.
 
@@ -101,8 +101,8 @@ pnpm tauri build   # release build
 
 Output:
 
-- `src-tauri\target\release\VILauncher.exe`
-- `src-tauri\target\release\bundle\nsis\VILauncher_<version>_x64-setup.exe`
+- `src-tauri\target\release\Neves Launcher.exe`
+- `src-tauri\target\release\bundle\nsis\Neves Launcher_<version>_x64-setup.exe`
 
 ### Check the build like CI
 
@@ -117,15 +117,15 @@ Each step prints PASS or FAIL with its timing; a failing step shows the last 40 
 
 ## Agent tools
 
-`scripts/vilauncher-agent.mjs` (run with `pnpm agent <command>`) lets an AI agent look at the launcher's projects and builds, read the logs, run the launcher's own Fix and verify, and turn an agent's fix into a patch you review first. Read-only commands always work. Anything that changes files needs the **AI agent access** setting turned on in the launcher, and `--yes` on the command. Run `pnpm agent help` for the list and the safety rules.
+`scripts/neves-launcher-agent.mjs` (run with `pnpm agent <command>`) lets an AI agent look at the launcher's projects and builds, read the logs, run the launcher's own Fix and verify, and turn an agent's fix into a patch you review first. Read-only commands always work. Anything that changes files needs the **AI agent access** setting turned on in the launcher, and `--yes` on the command. Run `pnpm agent help` for the list and the safety rules.
 
-Optional: the REA MCP server (`npx rea-agents@6.10.1 mcp`, MIT, from [morluto/rea](https://github.com/morluto/rea)) gives an agent reverse-engineering tools. Its native analysis needs Hopper, Ghidra, IDA or Kuna installed by you. Only point it at builds you are allowed to analyse. VILauncher does not bundle REA.
+Optional: the REA MCP server (`npx rea-agents@6.10.1 mcp`, MIT, from [morluto/rea](https://github.com/morluto/rea)) gives an agent reverse-engineering tools. Its native analysis needs Hopper, Ghidra, IDA or Kuna installed by you. Only point it at builds you are allowed to analyse. Neves Launcher does not bundle REA.
 
 ## Contributing
 
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you open a pull request. In short: open an issue for anything large, run `pnpm ci:check`, and keep the change focused.
 
-Problems with a *project* (its game, its code, its results) belong to that project's authors. Problems with the *list* belong to VIPortLive. Problems with *VILauncher itself* belong here.
+Problems with a *project* (its game, its code, its results) belong to that project's authors. Problems with the *list* belong to VIPortLive. Problems with *Neves Launcher itself* belong here.
 
 ## Project layout
 
@@ -135,13 +135,13 @@ Problems with a *project* (its game, its code, its results) belong to that proje
 | `src/dev/mock.ts` | Mock backend for the browser |
 | `src-tauri/` | Rust launcher (Tauri 2): project list, Git and Cargo jobs, saves, presets, updates, diagnostics |
 | `src-tauri/src/brand.rs` | Names, links, folders and project list sources |
-| `scripts/` | CI checks (`ci.mjs`) and the agent tool (`vilauncher-agent.mjs`) |
+| `scripts/` | CI checks (`ci.mjs`) and the agent tool (`neves-launcher-agent.mjs`) |
 
 The project list comes from `https://viportlive.com/api/launcher`. If that is unavailable, PortWatch's `tracker.json` is used.
 
 ## Legal notice
 
-VILauncher is a project manager. It does not include, download or distribute any game, game build or game files. You must provide your own copy of any game a project needs. You are responsible for what you install, build and run, and for having the right to use the files you supply. The software comes with no warranty, and VILauncher is not affiliated with any game publisher or developer.
+Neves Launcher is a project manager. It does not include, download or distribute any game, game build or game files. You must provide your own copy of any game a project needs. You are responsible for what you install, build and run, and for having the right to use the files you supply. The software comes with no warranty, and Neves Launcher is not affiliated with any game publisher or developer.
 
 The full text is in [LEGAL.md](LEGAL.md). The app shows it on first start and asks you to agree before the library opens.
 

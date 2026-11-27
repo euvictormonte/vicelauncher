@@ -145,7 +145,7 @@ pub(crate) fn save(repo: &Path, folder: &Path, slug: &str) -> Result<Option<Path
             .collect();
 
     let mut body = format!(
-        "# VILauncher saved these uncommitted changes from {} before an update.\n\
+        "# Neves Launcher saved these uncommitted changes from {} before an update.\n\
          # Apply with: git apply <this file>, run in the project folder.\n\
          # Untracked files (included below as new-file diffs):\n",
         repo.display()

@@ -1,4 +1,4 @@
-//! The player's settings on disk: `%APPDATA%\VILauncher\settings.json`.
+//! The player's settings on disk: `%APPDATA%\Neves Launcher\settings.json`.
 //! The first time, the settings of the launcher's earlier versions are read
 //! instead (eframe kept them in `data\app.ron`; `migrate_old_folders`
 //! copied Mandyhub's folder over).

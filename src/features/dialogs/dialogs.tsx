@@ -133,7 +133,7 @@ function ImportDialog({ open, onClose }: { open: boolean; onClose(): void }) {
       )}
       <div className="mt-5 flex items-start gap-3 rounded-lg border border-warn/20 bg-warn/8 px-3.5 py-3">
         <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
-        <p className="text-secondary text-fg-2">VILauncher builds and runs this code on your PC. Add only projects from people you trust: fake repos with malware exist.</p>
+        <p className="text-secondary text-fg-2">Neves Launcher builds and runs this code on your PC. Add only projects from people you trust: fake repos with malware exist.</p>
       </div>
     </Dialog>
     <ResponsibilityDialog
@@ -233,7 +233,7 @@ function SetupDialog({ repo, onClose }: { repo: string; onClose(): void }) {
       onOpenChange={(o) => !o && onClose()}
       eyebrow={alias(p).name}
       title={p.installed ? "Get ready to play" : "Get ready to install"}
-      description={ready ? "Everything is in place." : "A few things are needed first. VILauncher can set most of them up for you."}
+      description={ready ? "Everything is in place." : "A few things are needed first. Neves Launcher can set most of them up for you."}
       footer={
         <>
           <Button
@@ -314,7 +314,7 @@ function PresetsDialog({ repo, choice, onClose }: { repo: string; choice: PlayCh
       open
       onOpenChange={(o) => !o && onClose()}
       title="How should it start?"
-      description="Choose once: VILauncher remembers it for this project."
+      description="Choose once: Neves Launcher remembers it for this project."
       footer={
         <>
           <Button
@@ -513,7 +513,7 @@ function SavesDialog({ repo, onClose }: { repo: string; onClose(): void }) {
           <p className="text-caption text-fg-3">Letters, numbers, spaces, hyphens and underscores, up to 60.</p>
         </div>
       ) : deleting ? (
-        <p className="mt-4 text-secondary text-fg-2">Delete “{option?.title}”? The files move to VILauncher's deleted-saves folder.</p>
+        <p className="mt-4 text-secondary text-fg-2">Delete “{option?.title}”? The files move to Neves Launcher's deleted-saves folder.</p>
       ) : (
         option && !screenshot && (
           <div className="mt-3 flex flex-wrap gap-1">
@@ -523,7 +523,7 @@ function SavesDialog({ repo, onClose }: { repo: string; onClose(): void }) {
                 size="sm"
                 variant="ghost"
                 onClick={async () => {
-                  const path = await saveFile("Export this save", "VILauncher Save.zip", [{ name: "ZIP archive", extensions: ["zip"] }])
+                  const path = await saveFile("Export this save", "Neves Launcher Save.zip", [{ name: "ZIP archive", extensions: ["zip"] }])
                   if (path) void run({ type: "export_save", source: exportable, path }, "Save exported")
                 }}
               >

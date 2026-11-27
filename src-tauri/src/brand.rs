@@ -1,18 +1,18 @@
-//! Who VILauncher is and where it talks to: one place for the names, links
+//! Who Neves Launcher is and where it talks to: one place for the names, links
 //! and folders, so a fork only has to change this file.
 
 /// The launcher's name, in the title bar, the folders and the updater.
-pub const NAME: &str = "VILauncher";
+pub const NAME: &str = "Neves Launcher";
 /// Who makes it.
-pub const TEAM: &str = "VIPortLive team";
+pub const TEAM: &str = "Neves Launcher team";
 /// The site the launcher belongs to.
 pub const SITE: &str = "https://viportlive.com";
 pub const SITE_LABEL: &str = "viportlive.com";
 /// The launcher's own code and releases on GitHub (`owner/name`).
-pub const REPOSITORY: &str = "dazacode/vilauncher";
-pub const SOURCE_URL: &str = "https://github.com/dazacode/vilauncher";
+pub const REPOSITORY: &str = "euvictormonte/vilauncher";
+pub const SOURCE_URL: &str = "https://github.com/euvictormonte/vilauncher";
 /// The release download the updater looks for.
-pub const RELEASE_ASSET: &str = "VILauncher.exe";
+pub const RELEASE_ASSET: &str = "Neves Launcher.exe";
 
 /// Where the list of projects comes from, tried in order: VIPortLive's
 /// launcher feed (PortWatch's tracker with VIPortLive's corrections and
@@ -23,10 +23,10 @@ pub const PROJECT_SOURCES: &[(&str, &str)] = &[
 ];
 
 /// The folder under %LOCALAPPDATA% (projects, pictures) and %APPDATA% (settings).
-pub const FOLDER: &str = "VILauncher";
+pub const FOLDER: &str = "Neves Launcher";
 /// The launcher's earlier names: settings are carried over from these and
 /// already installed projects are found there (see `migrate_old_folders`).
-pub const LEGACY_FOLDERS: &[&str] = &["Mandyhub", "VI Launcher"];
+pub const LEGACY_FOLDERS: &[&str] = &["VILauncher", "Mandyhub", "VI Launcher"];
 
 /// %LOCALAPPDATA% (projects, pictures): on other systems, while developing,
 /// the platform's own data folder.
@@ -57,4 +57,4 @@ fn data_base() -> std::path::PathBuf {
 }
 
 /// What the launcher calls itself to web servers.
-pub const USER_AGENT: &str = concat!("VILauncher/", env!("CARGO_PKG_VERSION"));
+pub const USER_AGENT: &str = concat!("NevesLauncher/", env!("CARGO_PKG_VERSION"));

@@ -11,7 +11,7 @@ pub fn delete_save(workspace: &Path, source: &Path) -> io::Result<PathBuf> {
     let relative = source.strip_prefix(&workspace).map_err(|_| {
         io::Error::new(
             ErrorKind::InvalidInput,
-            "The save is outside VILauncher’s workspace.",
+            "The save is outside Neves Launcher’s workspace.",
         )
     })?;
     let save_folder = relative.starts_with("data") && relative.ends_with(SAVE_PATH);
@@ -23,7 +23,7 @@ pub fn delete_save(workspace: &Path, source: &Path) -> io::Result<PathBuf> {
     if !(save_folder || checkpoint) || !source.is_dir() {
         return Err(io::Error::new(
             ErrorKind::InvalidInput,
-            "This is not a VILauncher save folder.",
+            "This is not a Neves Launcher save folder.",
         ));
     }
     let deleted = workspace.join("deleted-saves");

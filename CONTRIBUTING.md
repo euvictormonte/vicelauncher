@@ -1,6 +1,6 @@
-# Contributing to VILauncher
+# Contributing to Neves Launcher
 
-Thank you for helping. VILauncher is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE) and [LEGAL.md](LEGAL.md)). By contributing you agree that your contribution is released under the same licence.
+Thank you for helping. Neves Launcher is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE) and [LEGAL.md](LEGAL.md)). By contributing you agree that your contribution is released under the same licence.
 
 ## Before you start
 
@@ -12,15 +12,15 @@ Thank you for helping. VILauncher is free software under the GPL-3.0-or-later (s
 
 - A **project** (its game, code, results or bugs) belongs to that project's authors. Report it to them.
 - The **project list** (which projects appear, their details, takedowns) belongs to VIPortLive.
-- **VILauncher itself** (the app, its builds, its warnings, its docs) belongs in this repository.
+- **Neves Launcher itself** (the app, its builds, its warnings, its docs) belongs in this repository.
 
 ## Setting up
 
 You need Windows 10 or 11, Node.js 22, pnpm 10, and Rust stable with the MSVC toolchain.
 
 ```powershell
-git clone https://github.com/<your-account>/vilauncher
-cd vilauncher
+git clone https://github.com/<your-account>/neves-launcher
+cd neves-launcher
 pnpm install
 pnpm tauri dev
 ```
@@ -58,7 +58,7 @@ If you change a Tauri command or a settings field, update `src/lib/types.ts` and
 
 ## Forks
 
-You may fork VILauncher and build something of your own under the same licence. A fork must keep the licence and notices, credit the authors, and say what it changed (see LEGAL.md, section 6). If you publish a fork, please name it differently so players can tell the two apart.
+You may fork Neves Launcher and build something of your own under the same licence. A fork must keep the licence and notices, credit the authors, and say what it changed (see LEGAL.md, section 6). If you publish a fork, please name it differently so players can tell the two apart.
 
 ## Conduct
 

@@ -1,5 +1,5 @@
 //! The last output of a project's job, kept on disk after the window closes, so
-//! `scripts\vilauncher-agent.mjs log <repo>` can read it: `<workspace>\logs\<slug>.log`.
+//! `scripts\neves-launcher-agent.mjs log <repo>` can read it: `<workspace>\logs\<slug>.log`.
 //! Each job overwrites its project's file. The file holds a header line (the
 //! time and the final stage), then the last 2000 lines of the job's output.
 //! Nothing here is under `data\`, and the user's name and folders are scrubbed.

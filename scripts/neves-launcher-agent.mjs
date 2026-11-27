@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// VILauncher agent tool. Lets an AI agent (Claude Code, opencode, or similar)
+// Neves Launcher agent tool. Lets an AI agent (Claude Code, opencode, or similar)
 // look at the launcher's projects and builds, read failure output, run the
 // launcher's own Fix and verify, and turn an agent-written fix into a patch the
 // player can review. Plain Node ESM with no dependencies (Node 22 and 24).
 //
 // Usage:
-//   node scripts/vilauncher-agent.mjs <command> [arguments] [--json]
+//   node scripts/neves-launcher-agent.mjs <command> [arguments] [--json]
 //
 // Commands. The first four always work; the rest need the flags shown.
 //   status                              launcher folders, agent access, tools, free space, projects and builds
@@ -18,7 +18,7 @@
 //   help                                this list and the safety rules
 //
 // Agent access is the setting "AI agent access" in the launcher. It is stored as
-// "agent_access": true in %APPDATA%\VILauncher\settings.json. Missing or false means off.
+// "agent_access": true in %APPDATA%\Neves Launcher\settings.json. Missing or false means off.
 // The launcher's own state is read from there; this tool never writes it.
 //
 // Typical flow: status -> log -> change the code on a branch in repos\<slug> ->
@@ -35,8 +35,8 @@
 //   the player's PC and is the player's responsibility. They need agent access AND --yes.
 // - patch-apply refuses: paths outside repos\<slug>, .git paths, symlinks, submodules,
 //   binary changes, non-git diffs, and files over 2 MB. It runs git apply --check first.
-// - fix refuses while VILauncher.exe is running (it may hold the files). It runs the launcher's
-//   --fix command from src-tauri\target\release\VILauncher.exe, or the debug build if no release
+// - fix refuses while Neves Launcher.exe is running (it may hold the files). It runs the launcher's
+//   --fix command from src-tauri\target\release\Neves Launcher.exe, or the debug build if no release
 //   build exists. The launcher's --fix refuses too unless agent access is on and no window runs.
 //
 // Exit codes: 0 ok, 1 refused (agent access off, --yes missing, unsafe patch, launcher running),
@@ -50,8 +50,8 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const EXIT = { ok: 0, refused: 1, usage: 2, failure: 3 };
-const FOLDER = "VILauncher";
-const EXE_NAME = "VILauncher.exe";
+const FOLDER = "Neves Launcher";
+const EXE_NAME = "Neves Launcher.exe";
 const MAX_PATCH_BYTES = 2 * 1024 * 1024;
 const COMMIT = /^[0-9a-f]{7,40}$/;
 const OWNER_NAME = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
@@ -170,7 +170,7 @@ async function loadSettings(folders) {
   return result;
 }
 
-// The workspace is settings.install_dir when set, else %LOCALAPPDATA%\VILauncher.
+// The workspace is settings.install_dir when set, else %LOCALAPPDATA%\Neves Launcher.
 function workspaceOf(settings, folders) {
   if (settings.installDir) return { path: settings.installDir, kind: "custom" };
   if (folders.local) return { path: folders.local, kind: "default" };
@@ -342,7 +342,7 @@ function isInside(parent, child) {
 function accessProblem(settings) {
   if (settings.error) return `settings.json could not be read (${settings.error}), so agent access counts as off`;
   if (!settings.agentAccess) {
-    return "agent access is off. Ask the player to turn on 'AI agent access' in VILauncher Settings. Nothing was changed.";
+    return "agent access is off. Ask the player to turn on 'AI agent access' in Neves Launcher Settings. Nothing was changed.";
   }
   return null;
 }
@@ -380,7 +380,7 @@ async function cmdStatus() {
     ],
   };
   const lines = [
-    "VILauncher agent status",
+    "Neves Launcher agent status",
     `Settings:       %APPDATA%\\${FOLDER}\\settings.json  ${data.settings_file}`,
     `Install folder: ${ws ? (ws.kind === "custom" ? "custom folder set in Settings" : `%LOCALAPPDATA%\\${FOLDER}`) : "unknown"}  ${wsExists ? "found" : "missing"}`,
     `Agent access:  ${accessOn ? "on" : "off (fix and patch-apply are refused)"}`,
@@ -617,7 +617,7 @@ async function cmdPatchApply(args, flags) {
   const applied = await git(["apply", patchPath], repoDir);
   if (!applied.ok) throw failure(`git apply failed: ${applied.stderr.trim()}`);
   const status = (await git(["status", "--porcelain=v1"], repoDir)).stdout.split(/\r?\n/).filter(Boolean);
-  const next = `node scripts/vilauncher-agent.mjs fix ${repo} --yes`;
+  const next = `node scripts/neves-launcher-agent.mjs fix ${repo} --yes`;
   const data = { ok: true, applied: true, committed: false, files, status, next };
   const lines = [
     `Applied the patch to repos\\${slug} (working tree only, not committed, not pushed).`,
@@ -637,10 +637,10 @@ async function cmdFix(args, flags, emit) {
   const debugExe = join(ROOT, "src-tauri", "target", "debug", EXE_NAME);
   const exe = (await isFile(releaseExe)) ? releaseExe : (await isFile(debugExe)) ? debugExe : null;
   if (!exe) {
-    throw failure("the launcher is not built. Run cargo build --release in src-tauri first (src-tauri\\target\\release\\VILauncher.exe)");
+    throw failure("the launcher is not built. Run pnpm tauri build first (src-tauri\\target\\release\\Neves Launcher.exe)");
   }
   const running = await launcherRunning();
-  if (running) throw refused("VILauncher is running. Close it first: it may hold the files Fix needs.");
+  if (running) throw refused("Neves Launcher is running. Close it first: it may hold the files Fix needs.");
 
   const ws = workspaceOf(settings, folders);
   const extra = ws ? [ws.path] : [];
@@ -702,8 +702,8 @@ function lineSplitter(onLine) {
 function launcherRunning() {
   return new Promise((done, reject) => {
     execFile("tasklist", ["/FI", `IMAGENAME eq ${EXE_NAME}`, "/FO", "CSV", "/NH"], { windowsHide: true }, (error, stdout) => {
-      if (error) reject(failure("could not check whether VILauncher is running (tasklist failed), so Fix was not started"));
-      else done(/"VILauncher\.exe"/i.test(String(stdout)));
+      if (error) reject(failure("could not check whether Neves Launcher is running (tasklist failed), so Fix was not started"));
+      else done(/"Neves Launcher\.exe"/i.test(String(stdout)));
     });
   });
 }
@@ -748,7 +748,7 @@ const SAFETY = [
 function helpLines() {
   const data = helpData();
   return [
-    "Usage: node scripts/vilauncher-agent.mjs <command> [arguments] [--json]",
+    "Usage: node scripts/neves-launcher-agent.mjs <command> [arguments] [--json]",
     "",
     ...data.commands.map((c) => `  ${`${c.name} ${c.args}`.trim().padEnd(40)} needs: ${c.needs}`),
     "",
@@ -814,8 +814,8 @@ async function main() {
   const json = flags.json;
   try {
     const handler = HANDLERS[command];
-    if (!handler) throw usage(`unknown command "${command}". Run: node scripts/vilauncher-agent.mjs help`);
-    if (args.length !== handler.args) throw usage(`${command} takes ${handler.args} argument(s). Run: node scripts/vilauncher-agent.mjs help`);
+    if (!handler) throw usage(`unknown command "${command}". Run: node scripts/neves-launcher-agent.mjs help`);
+    if (args.length !== handler.args) throw usage(`${command} takes ${handler.args} argument(s). Run: node scripts/neves-launcher-agent.mjs help`);
     if (flags.yes && !handler.yes) throw usage(`${command} does not take --yes`);
     if (flags.out && !handler.out) throw usage(`${command} does not take --out`);
     // Human lines are printed as they come (fix streams its output); --json prints one object at the end.

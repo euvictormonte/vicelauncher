@@ -1,16 +1,16 @@
 [package]
-name = "vilauncher"
-version = "1.0.2"
+name = "neves-launcher"
+version = "1.0.3"
 edition = "2021"
 rust-version = "1.82"
-description = "VILauncher by the VIPortLive team: a community launcher for VIctory-based projects. Pick a project from VIPortLive or a custom link, check the game files, build and play. Forked from Mandyhub."
+description = "Neves Launcher: a launcher for community projects from VIPortLive or custom links. Check the game files, build and play. Forked from VILauncher, based on Mandyhub."
 license = "GPL-3.0-or-later"
-repository = "https://github.com/dazacode/vilauncher"
+repository = "https://github.com/euvictormonte/vilauncher"
 homepage = "https://viportlive.com"
 authors = ["VIPortLive team", "Zettrox and the Mandyhub contributors"]
 
 [[bin]]
-name = "VILauncher"
+name = "neves_launcher"
 path = "src/main.rs"
 
 [build-dependencies]

@@ -1,9 +1,13 @@
 # Antivirus flags and false positives
 
-VILauncher is a launcher: it downloads code, runs `git`, `cargo` and `winget`, starts
+Neves Launcher is a launcher: it downloads code, runs `git`, `cargo` and `winget`, starts
 game executables and replaces itself when updating. Its binaries are also unsigned and
 new on every release. That mix is what heuristic engines score as suspicious even when
 nothing is wrong.
+
+The signature and release links below still refer to the upstream VILauncher repository.
+Neves Launcher has no release repository yet; do not treat an upstream signature or
+download as validation of a Neves Launcher build.
 
 The usual result is a VirusTotal page like this:
 
@@ -23,7 +27,7 @@ The file is still worth checking once, but the flag can be removed.
    installer both have their own digest.
 2. Check the Authenticode signature:
    ```powershell
-   Get-AuthenticodeSignature .\VILauncher.exe | Format-List Status, SignerCertificate
+   Get-AuthenticodeSignature .\Neves Launcher.exe | Format-List Status, SignerCertificate
    ```
    `Status` should be `Valid` and the signer **VIPortLive team**. `NotSigned` only means
    the release predates signing or the certificate setup; the SHA-256 check still applies.
@@ -59,8 +63,9 @@ The build already supports it. It is off until you provide a certificate:
      and paste the body without the BEGIN/END lines).
    - `WINDOWS_CERTIFICATE_PASSWORD`: its export password.
 4. The Build workflow imports the certificate, and `scripts/sign-windows.mjs` signs and
-   verifies `VILauncher.exe` and the installer before upload. Locally, set
-   `VILAUNCHER_SIGN_THUMBPRINT` to the certificate thumbprint to sign too. Without it the
+   verifies `Neves Launcher.exe` and the installer before upload. Locally, set
+   `NEVES_LAUNCHER_SIGN_THUMBPRINT` to the certificate thumbprint to sign too. The old
+   `VILAUNCHER_SIGN_THUMBPRINT` name remains accepted for existing build setups. Without it the
    build is unsigned and still succeeds.
 
 Sign the portable `.exe` **and** the installer. An unsigned installer wrapping a signed
@@ -74,13 +79,13 @@ analysts need the hash and where to get the file.
 Send to `fp@trapmine.com` (cc `support@trapmine.com`):
 
 ```
-Subject: False positive: VILauncher <version> (Trapmine ML, VirusTotal)
+Subject: False positive: Neves Launcher <version> (Trapmine ML, VirusTotal)
 
 Hello,
 
-VILauncher is an open-source (GPL-3.0) Windows game launcher built with Rust and Tauri.
+Neves Launcher is an open-source (GPL-3.0) Windows game launcher built with Rust and Tauri.
 
-File: VILauncher.exe (portable build, also wrapped by the NSIS installer in the release)
+File: Neves Launcher.exe (portable build, also wrapped by the NSIS installer in the release)
 SHA-256: <digest>
 Version: <version>
 Download: <GitHub release asset URL>
@@ -123,7 +128,7 @@ days or never come. Do the signing anyway, and start with step 1 instead of wait
 
 ## Statement from the maintainers
 
-VILauncher has been flagged by one machine-learning engine, Trapmine, and that flag is a
+Neves Launcher has been flagged by one machine-learning engine, Trapmine, and that flag is a
 **false positive**. We have no intention of distributing malware. The launcher is open
 source under GPL-3.0-or-later, every release is built from a public commit by a public
 workflow, and we are happy to show proof: the source, the build logs, the SHA-256 digests

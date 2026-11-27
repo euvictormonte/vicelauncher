@@ -3,7 +3,7 @@ import { useRef } from "react"
 import { toast } from "sonner"
 import { pawsUnlocked, unlockPaws, useTheme } from "@/lib/theme"
 
-/** The VIL logo and "VILauncher" set as VIPortLive sets its name: VI heavy, the rest in pink script. */
+/** Neves Launcher wordmark. */
 export function Brand() {
   const theme = useTheme()
   const clicks = useRef(0)
@@ -24,8 +24,8 @@ export function Brand() {
         draggable={false}
       />
       <span className="flex items-baseline leading-none">
-        <span className="font-display text-[17px] font-extrabold tracking-[-0.02em] text-fg">VI</span>
-        <span className="ml-px font-script text-[21px] text-accent-fg">Launcher</span>
+        <span className="font-display text-[17px] font-extrabold tracking-[-0.02em] text-fg">Neves</span>
+        <span className="ml-1 font-script text-[21px] text-accent-fg">Launcher</span>
       </span>
       {theme === "paws" && <PawPrint aria-hidden className="ml-1 size-3.5 text-accent-fg" />}
     </div>
