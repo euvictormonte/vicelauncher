@@ -74,7 +74,8 @@ Mesmo assim, mecanismos de análise por aprendizado de máquina, como o Trapmine
 
 ## Capturas de tela
 
-![Projeto ainda não instalado, com o botão de configuração](assets/screenshots/first-setup.png)
+![Projeto ainda não instalado, com o botão de configuração]<img width="1682" height="1157" alt="image" src="https://github.com/user-attachments/assets/8285a4ed-346d-466a-988f-d60584503d32" />
+
 
 As capturas de tela utilizam dados de exemplo do navegador de demonstração, não informações de um computador ou conta real.
 
