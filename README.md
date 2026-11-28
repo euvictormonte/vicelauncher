@@ -1,10 +1,4 @@
-<img width="80" height="80" alt="gerar_mesma_imagem_exata_62539086_2K" src="https://github.com/user-attachments/assets/968023e5-8529-40e1-96ae-ace102731314" />  # Neves Launcher
-
-
-<p align="center">
-  <a href="LICENSE"><img alt="Licença: GPL-3.0-or-later" src=""></a>
-  <img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/28bb0e18-8510-49aa-a699-a999b3618937" />
-</a>
+# Neves Launcher
 
 </p>
 
