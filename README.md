@@ -6,13 +6,14 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="Licença: GPL-3.0-or-later" src=""></a>
-  <img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/869b729d-ddaa-4c90-adbb-dcf307f99dd5" ></a>
+  <img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/28bb0e18-8510-49aa-a699-a999b3618937" />
+</a>
 
 </p>
 
 Um launcher para Windows voltado a projetos de jogos desenvolvidos pela comunidade. Ele lista projetos disponíveis no [VIPortLive](https://viportlive.com), baixa e compila os projetos usando Git e Cargo, e permite executá-los utilizando **os arquivos do jogo que você já possui**.
 
-![Biblioteca do Neves Launcher: versões recomendadas, filtros e visão geral de um projeto](assets/screenshots/library.png)
+![Biblioteca do Neves Launcher: versões recomendadas, filtros e visão geral de um projeto]<img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/869b729d-ddaa-4c90-adbb-dcf307f99dd5" />
 
 > **Nenhum jogo está incluído.** O Neves Launcher não acompanha arquivos de jogos, não baixa esses arquivos e não possui vínculo com a Rockstar Games, Take-Two Interactive ou qualquer outra publicadora. Consulte [LEGAL.md](LEGAL.md).
 
