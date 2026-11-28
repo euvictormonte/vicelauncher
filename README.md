@@ -7,7 +7,8 @@
 <p align="center">
   <a href="LICENSE"><img alt="Licença: GPL-3.0-or-later" src=""></a>
   <a href="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml"><img alt="Build" src="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml/badge.svg"></a>
-  <a href="https://github.com/euvictormonte/vicelauncher/releases/latest"><img alt="Última versão" src="https://img.shields.io/github/v/release/euvictormonte/vicelauncher?color=ff4fa8&cacheSeconds=300"></a>
+  <a href="https://github.com/euvictormonte/vicelauncher/releases/latest"><img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/869b729d-ddaa-4c90-adbb-dcf307f99dd5" /></a>
+
 </p>
 
 Um launcher para Windows voltado a projetos de jogos desenvolvidos pela comunidade. Ele lista projetos disponíveis no [VIPortLive](https://viportlive.com), baixa e compila os projetos usando Git e Cargo, e permite executá-los utilizando **os arquivos do jogo que você já possui**.
