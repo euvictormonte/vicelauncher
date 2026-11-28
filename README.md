@@ -1,8 +1,7 @@
 # Neves Launcher
 
 <p align="center">
-  <img src="assets/bannr.png" alt="Neves Launcher" width="960">
-</p>
+  <img width="2048" height="2048" alt="gerar_mesma_imagem_exata_62539086_2K" src="https://github.com/user-attachments/assets/968023e5-8529-40e1-96ae-ace102731314" /> alt="Neves Launcher" width="960"> </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="Licença: GPL-3.0-or-later" src=""></a>
