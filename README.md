@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="Licença: GPL-3.0-or-later" src=""></a>
-  <a href="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml"><img alt="Build" src="https://github.com/euvictormonte/vicelauncher/actions/workflows/build.yml/badge.svg"></a>
+  <img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/869b729d-ddaa-4c90-adbb-dcf307f99dd5" /></a>
   <a href="https://github.com/euvictormonte/vicelauncher/releases/latest"><img width="1690" height="1155" alt="image" src="https://github.com/user-attachments/assets/869b729d-ddaa-4c90-adbb-dcf307f99dd5" /></a>
 
 </p>
