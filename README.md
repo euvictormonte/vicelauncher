@@ -1,4 +1,4 @@
-# Neves Launcher <img width="80" height="80" alt="gerar_mesma_imagem_exata_62539086_2K" src="https://github.com/user-attachments/assets/968023e5-8529-40e1-96ae-ace102731314" />
+<img width="80" height="80" alt="gerar_mesma_imagem_exata_62539086_2K" src="https://github.com/user-attachments/assets/968023e5-8529-40e1-96ae-ace102731314" /> # Neves Launcher
 
 
 <p align="center">
